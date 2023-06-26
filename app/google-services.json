@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "481126677781",
+    "project_id": "falesie-3df38",
+    "storage_bucket": "falesie-3df38.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:481126677781:android:5761c647f5e2b4b82b3d1c",
+        "android_client_info": {
+          "package_name": "com.example.falesie"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "481126677781-08k2pv670bul7t4unroeqtts2otdfijo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB13p4Uji3Ug2bN3h1vnFiC8V1gshbz9eI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "481126677781-08k2pv670bul7t4unroeqtts2otdfijo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
