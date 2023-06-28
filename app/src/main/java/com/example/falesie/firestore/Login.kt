@@ -7,24 +7,22 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Contacts
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Visibility
@@ -40,17 +38,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -60,10 +58,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -71,25 +70,112 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.falesie.R
-import com.example.falesie.screen.FalesieScreen
-import com.example.falesie.ui.theme.FalesieTheme
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(auth: FirebaseAuth) {
 
+    // MODAL NAVIGATION DRAWER
+    //https://www.youtube.com/watch?v=Fp-RB1lDkgo&t=75s
+    // TOP APP BAR
+    //https://www.youtube.com/watch?v=hQJpd78RUVg&list=PL-SHw8LBtGoZSwF_gS4FYbNybDftC9ssb&index=5&t=587s
+    val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
+    val scope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val menuList = listOf(Icons.Filled.Contacts to "Contacts", Icons.Filled.History to "History")
+    var selectedItems by remember { mutableStateOf(-1) }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                menuList.forEachIndexed { index, data ->
+                    NavigationDrawerItem(
+                        modifier = Modifier.padding(top = 16.dp),
+                        icon = {Icon(imageVector = data.first, contentDescription = data.second)},
+                        label = {Text(text = data.second) },
+                        selected = selectedItems == index,
+                        onClick = {
+                            selectedItems = index
+                        })
+                }
+
+            }
+        }
+    ) {
+
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehaivor.nestedScrollConnection),
+            topBar = {
+                TopAppBar(
+                    scrollBehavior = scrollBehaivor,
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Menu Icon"
+                            )
+                        }
+                    },
+                    title = {
+                        Text(text = "Falesie")
+                    },
+//                     colors = TopAppBarDefaults.smallTopAppBarColors(
+//                         containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+//                     )
+                )
+            },
+            content = {
+                //CustomList(paddingValues = it)
+                LoginFrame(paddingValues = it, auth)
+            }
+        )
+
+
+    }
+
+
+}
+
+
+// TEMP PER LAZY LIST
+@Composable
+fun CustomList(paddingValues: PaddingValues) {
+    val numbers = remember { mutableStateListOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14) }
+
+    LazyColumn(
+        modifier = Modifier
+            .padding(top = paddingValues.calculateTopPadding())
+    ) {
+        items(items = numbers, key = { it.hashCode() }) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(all = 24.dp),
+                text = "$it",
+                style = TextStyle(
+                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                    fontWeight = FontWeight.Medium
+                )
+            )
+        }
+    }
+}
+// FINE
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LoginFrame(paddingValues: PaddingValues, auth: FirebaseAuth) {
 
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -100,33 +186,12 @@ fun LoginScreen(auth: FirebaseAuth) {
             Patterns.EMAIL_ADDRESS.matcher(email).matches()
         }
     }
-    val isPasswordValid by remember {
-        derivedStateOf {
-            password.length > 5
-        }
-    }
+    val isPasswordValid by remember { derivedStateOf { password.length > 5 } }
     var isPasswordVisible by remember { mutableStateOf(false) }
-    //val navController = rememberNavController()
 
-
-//    Box() {
-//
-//
-//        NavHost(
-//            navController = navController,
-//            startDestination = "Login"
-//        ) {
-//            composable("Login") {
-//                LoginScreen(auth)
-//            }
-//            composable("Falesie") {
-//                FalesieScreen()
-//            }
-//
-//        }
-//
     Column(
         modifier = Modifier
+            .padding(top = paddingValues.calculateTopPadding())
             .background(color = MaterialTheme.colorScheme.background)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -139,7 +204,7 @@ fun LoginScreen(auth: FirebaseAuth) {
             fontStyle = FontStyle.Italic,
             fontSize = 32.sp,
             modifier = Modifier
-                .padding(top = 20.dp)
+                .padding(top = 20.dp, bottom = 16.dp)
         )
 
         Image(
@@ -151,11 +216,11 @@ fun LoginScreen(auth: FirebaseAuth) {
         )
 
         Text(
-            text = "...falesie!",
+            text = "...Falesie!",
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Bold,
             fontStyle = FontStyle.Italic,
-            fontSize = 32.sp,
+            fontSize = 40.sp,
             modifier = Modifier
                 .padding(bottom = 16.dp)
         )
@@ -340,16 +405,5 @@ fun LoginScreen(auth: FirebaseAuth) {
 
     }
 
-    //}
 
-
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    FalesieTheme {
-        LoginScreen(Firebase.auth)
-    }
 }
