@@ -62,6 +62,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -198,7 +199,7 @@ fun LoginFrame(paddingValues: PaddingValues, auth: FirebaseAuth) {
         verticalArrangement = Arrangement.Top
     ) {
         Text(
-            text = "Bentornato in...",
+            text = stringResource(id = R.string.welcome),
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Bold,
             fontStyle = FontStyle.Italic,
@@ -216,7 +217,7 @@ fun LoginFrame(paddingValues: PaddingValues, auth: FirebaseAuth) {
         )
 
         Text(
-            text = "...Falesie!",
+            text = stringResource(id = R.string.welcome2),
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Bold,
             fontStyle = FontStyle.Italic,
@@ -242,7 +243,7 @@ fun LoginFrame(paddingValues: PaddingValues, auth: FirebaseAuth) {
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Indirizzo Email") },
+                    label = { Text(stringResource(id = R.string.indirizzo_email)) },
                     placeholder = { Text("abc@domain.com") },
                     singleLine = true,
                     modifier = Modifier
@@ -270,7 +271,7 @@ fun LoginFrame(paddingValues: PaddingValues, auth: FirebaseAuth) {
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Password") },
+                    label = { Text(stringResource(id = R.string.password)) },
                     singleLine = true,
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -308,7 +309,7 @@ fun LoginFrame(paddingValues: PaddingValues, auth: FirebaseAuth) {
                                     password = ""
                                     Toast.makeText(
                                         context,
-                                        "The user has successfully loged in",
+                                        context.resources.getString(R.string.login_eseguito),
                                         Toast.LENGTH_LONG
                                     ).show()
                                     //TODO AVVIARE LA SCHERMATA PRINCIPALE DELL'APPLICAZIONE
@@ -322,7 +323,7 @@ fun LoginFrame(paddingValues: PaddingValues, auth: FirebaseAuth) {
                                     password = ""
                                     Toast.makeText(
                                         context,
-                                        "The user has FAILED to log in " +
+                                        context.resources.getString(R.string.errore_login) +
                                                 " ${it.exception.toString()}",
                                         Toast.LENGTH_LONG
                                     ).show()
@@ -335,7 +336,7 @@ fun LoginFrame(paddingValues: PaddingValues, auth: FirebaseAuth) {
                     enabled = isEmailValid && isPasswordValid
                 ) {
                     Text(
-                        text = "Login",
+                        text = stringResource(id = R.string.login),
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.secondary,
                         fontSize = 16.sp
@@ -352,7 +353,7 @@ fun LoginFrame(paddingValues: PaddingValues, auth: FirebaseAuth) {
                 Text(
                     color = MaterialTheme.colorScheme.secondary,
                     fontStyle = FontStyle.Italic,
-                    text = "Password dimenticata?",
+                    text = stringResource(id = R.string.password_dimenticata) ,
                     modifier = Modifier
                         .padding(end = 8.dp)
                 )
@@ -369,7 +370,7 @@ fun LoginFrame(paddingValues: PaddingValues, auth: FirebaseAuth) {
                             password = ""
                             Toast.makeText(
                                 context,
-                                "The user has successfully loged in",
+                                context.resources.getString(R.string.account_creato),
                                 Toast.LENGTH_LONG
                             ).show()
                         } else {
@@ -382,7 +383,7 @@ fun LoginFrame(paddingValues: PaddingValues, auth: FirebaseAuth) {
                             password = ""
                             Toast.makeText(
                                 context,
-                                "The user has FAILED to create account " +
+                                context.resources.getString(R.string.errore_account) +
                                         " ${it.exception.toString()}",
                                 Toast.LENGTH_LONG
                             ).show()
@@ -396,7 +397,7 @@ fun LoginFrame(paddingValues: PaddingValues, auth: FirebaseAuth) {
             colors = ButtonDefaults.buttonColors(Color.White)
         ) {
             Text(
-                text = "Registrati",
+                text = stringResource(id = R.string.registrati),
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.secondary,
                 fontSize = 16.sp

@@ -1,7 +1,18 @@
 <resources>
     <string name="app_name">Falesie</string>
     <string name="web_client_id">481126677781-c10a9ofishe1otgsqa4js3fpohde7b4p.apps.googleusercontent.com</string>
-    <string name="hello">Hey there, </string>
     <string name="create_account">Create an Account</string>
-    <string name="welcome">Welcome Back</string>
+    <string name="welcome">Bentornato in…</string>
+    <string name="welcome2">…Falesie!</string>
+    <string name="indirizzo_email">Indirizzo email</string>
+    <string name="password">Password</string>
+    <string name="login_eseguito">Login eseguito correttamente</string>
+    <string name="errore_login">Errore login</string>
+    <string name="account_creato">Account creato correttamente</string>
+    <string name="errore_account">Errore nella creazione account</string>
+    <string name="password_dimenticata">Passowrd dimenticata?</string>
+    <string name="login">Login</string>
+    <string name="registrati">Registrati</string>
+
+
 </resources>
