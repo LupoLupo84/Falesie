@@ -4,15 +4,18 @@
     <string name="create_account">Create an Account</string>
     <string name="welcome">Bentornato in…</string>
     <string name="welcome2">…Falesie!</string>
+    <string name="nome">Nome</string>
     <string name="indirizzo_email">Indirizzo email</string>
     <string name="password">Password</string>
-    <string name="login_eseguito">Login eseguito correttamente</string>
+    <string name="confirmPassword">Conferma Password</string>
+    <string name="login_eseguito">Benvenuto </string>
     <string name="errore_login">Errore login</string>
     <string name="account_creato">Account creato correttamente</string>
     <string name="errore_account">Errore nella creazione account</string>
     <string name="password_dimenticata">Passowrd dimenticata?</string>
     <string name="login">Login</string>
     <string name="registrati">Registrati</string>
+    <string name="disconnessione_eseguita">Logout eseguito</string>
 
 
 </resources>
