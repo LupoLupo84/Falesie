@@ -4,14 +4,21 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import com.example.falesie.Aggiorna
 import com.example.falesie.Constants
+import com.example.falesie.MainActivity.Companion.listaFalesie
+import com.example.falesie.MainActivity.Companion.listaVie
 import com.example.falesie.MainActivity.Companion.userCorrente
 import com.example.falesie.R
+import com.example.falesie.model.Falesia
 import com.example.falesie.model.User
+import com.example.falesie.model.Via
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+
 
 class FirestoreClass {
     // Create a instance of Firebase Firestore
@@ -133,7 +140,46 @@ class FirestoreClass {
 
 
 
+    fun leggiTutteLeFalesie(aggiorna: Aggiorna) {
+        mFireStore.collection(Constants.FALESIA).get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    //val list = ArrayList<Via>()
+                    for (document in task.result) {
+                        val falesia = document.toObject(Falesia::class.java)
+                        //Log.i("*************Falesia letta da Firestore", "${falesia.id} -> ${falesia.nome}")
+                        listaFalesie.add(falesia)
+                        //Log.i("*************Vie lette de Firestore", "${list.size}")
+                    }
+                    aggiorna.aggiorna()
+                }
+            }
+            .addOnFailureListener { e ->
+                //BaseActivity().showErrorSnackBar(e.toString())
+                Log.e("ERRORE", "${e}")
+            }
+    }
 
+
+    fun leggiTutteLeVie(aggiorna: Aggiorna) {
+        mFireStore.collection(Constants.VIA).get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    //val list = ArrayList<Via>()
+                    for (document in task.result) {
+                        Log.i("*************Vie lette de Firestore", "${document.id}")
+                        val via = document.toObject(Via::class.java)
+                        listaVie.add(via)
+                        //Log.i("*************Vie lette de Firestore", "${list.size}")
+                    }
+                    aggiorna.aggiorna()
+                }
+            }
+            .addOnFailureListener { e ->
+                //BaseActivity().showErrorSnackBar(e.toString())
+                Log.e("ERRORE", "${e}")
+            }
+    }
 
 }
 

@@ -8,12 +8,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.falesie.firestore.FirestoreClass
+import com.example.falesie.model.Falesia
 import com.example.falesie.model.User
+import com.example.falesie.model.Via
 import com.example.falesie.screen.LoginScreen
 import com.example.falesie.screen.FalesieScreen
 import com.example.falesie.screen.GestioneFalesieScreen
@@ -26,14 +32,15 @@ import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
 
-    companion object{
+    companion object {
         val auth by lazy { Firebase.auth }
         lateinit var userCorrente: User
         //var userCorrente: User = User()
+        var listaVie: ArrayList<Via> = ArrayList()                          // Tutte le vie presenti nel db
+        var listaFalesie: ArrayList<Falesia> = ArrayList()                  // Tutte le falesie presenti nel db
+        var listaVieSelezionate: ArrayList<Via> = ArrayList()               // Vie presenti nella falesia corrente
+        var falesiaSelezionata:Falesia = Falesia()                          // Falesia selezionata per la modifica
     }
-
-
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,50 +84,15 @@ class MainActivity : ComponentActivity() {
                     composable("GestioneFalesieScreen") {
                         GestioneFalesieScreen(navController)
                     }
-//                    composable("screen1"){ entry ->
-//                        val text = entry.savedStateHandle.get<String>("my_text")
-//                        Column(modifier = Modifier.fillMaxSize()) {
-//                            text?.let {
-//                                Text(text = text)
-//                            }
-//                            Button(onClick = {navController.navigate("screen2")}) {
-//                                Text(text = "Go to screen 2")
-//                            }
-//                        }
-//                    }
-//                    composable("screen2"){
-//                        Column(modifier = Modifier.fillMaxSize()) {
-//                            var text by remember{
-//                                mutableStateOf("")
-//                            }
-//                            OutlinedTextField(
-//                                value = text,
-//                                onValueChange = { text = it},
-//                                modifier = Modifier.width(300.dp)
-//                            )
-//                            Button(onClick = {
-//                                navController.previousBackStackEntry
-//                                    ?.savedStateHandle
-//                                    ?.set("my_text", text)
-//                                navController.popBackStack()
-//                            }) {
-//                                Text(text = "Apply")
-//                            }
-//                        }
-//                    }
+
 
                 }
 
 
-//                Surface(color = MaterialTheme.colorScheme.background) {
-//                    //LoginScreen(auth)
-//                }
             }
         }
 
     }
-
-
 
 
 }
