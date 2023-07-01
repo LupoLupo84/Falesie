@@ -58,6 +58,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.falesie.MainActivity.Companion.auth
 import com.example.falesie.R
 import com.example.falesie.firestore.FirestoreClass
 import com.example.falesie.model.User
@@ -68,7 +69,7 @@ import com.google.firebase.auth.FirebaseUser
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(auth: FirebaseAuth, navController: NavHostController) {
+fun RegisterScreen(navController: NavHostController) {
     val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)

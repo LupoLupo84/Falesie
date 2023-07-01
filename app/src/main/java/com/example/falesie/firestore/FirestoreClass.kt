@@ -106,6 +106,35 @@ class FirestoreClass {
     }
 
 
+    fun firstLoadUserData() {
+
+        // Here we pass the collection name from which we wants the data.
+        mFireStore.collection(Constants.USERS)
+            // The document id to get the Fields of user.
+            .document(getCurrentUserID())
+            .get()
+            .addOnSuccessListener { document ->
+                Log.d("LETTURA DOCUMENTO", document.toString())
+
+                // Here we have received the document snapshot which is converted into the User Data model object.
+                //val loggedInUser = document.toObject(User::class.java)!!
+                //userCorrente = loggedInUser
+                userCorrente = document.toObject(User::class.java)!!
+
+            }
+            .addOnFailureListener { e ->
+                Log.e(
+                    "ERRORE",
+                    "Error while getting loggedIn user details",
+                    e
+                )
+            }
+    }
+
+
+
+
+
 }
 
 
