@@ -58,6 +58,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.falesie.MainActivity.Companion.userCorrente
 import com.example.falesie.R
 import com.example.falesie.firestore.FirestoreClass
 import com.example.falesie.model.User
