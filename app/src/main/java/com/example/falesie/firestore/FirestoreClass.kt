@@ -12,7 +12,6 @@ import com.example.falesie.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import kotlinx.coroutines.tasks.await
 
 class FirestoreClass {
     // Create a instance of Firebase Firestore
@@ -95,33 +94,6 @@ class FirestoreClass {
                     navController.popBackStack()
                     navController.navigate("FalesieScreen")
                 }
-
-            }
-            .addOnFailureListener { e ->
-                Log.e(
-                    "ERRORE",
-                    "Error while getting loggedIn user details",
-                    e
-                )
-            }
-    }
-
-
-    fun firstLoadUserData() {
-        Log.i("TEST", "NELLA CHIAMATA")
-        // Here we pass the collection name from which we wants the data.
-        mFireStore.collection(Constants.USERS)
-            // The document id to get the Fields of user.
-            .document(getCurrentUserID())
-            .get()
-            .addOnSuccessListener { document ->
-                //Log.d("LETTURA DOCUMENTO", document.toString())
-                Log.i("TEST", "RISULTATO CHIAMATA")
-
-                // Here we have received the document snapshot which is converted into the User Data model object.
-                //val loggedInUser = document.toObject(User::class.java)!!
-                //userCorrente = loggedInUser
-                userCorrente = document.toObject(User::class.java)!!
 
             }
             .addOnFailureListener { e ->
