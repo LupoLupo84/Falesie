@@ -23,6 +23,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.falesie.MainActivity.Companion.userCorrente
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
