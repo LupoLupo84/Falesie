@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import com.example.falesie.Aggiorna
 import com.example.falesie.Constants
+import com.example.falesie.MainActivity.Companion.arrayVieScalateUser
 import com.example.falesie.MainActivity.Companion.listaFalesie
 import com.example.falesie.MainActivity.Companion.listaVie
 import com.example.falesie.MainActivity.Companion.userCorrente
@@ -79,6 +80,7 @@ class FirestoreClass {
 
     fun loadUserData(provenienza: String, navController: NavHostController, context: Context) {
 
+
         // Here we pass the collection name from which we wants the data.
         mFireStore.collection(Constants.USERS)
             // The document id to get the Fields of user.
@@ -113,31 +115,35 @@ class FirestoreClass {
     }
 
 
-    fun firstLoadUserData() {
+    //fun firstLoadUserData(aggiorna: Aggiorna) {
+    fun firstLoadUserData(): User {
 
+        userCorrente = User()
+        Log.d("TEST", "ingresso nella funzione")
+        Log.d("TEST", getCurrentUserID())
+        if (getCurrentUserID().isEmpty()) {
+            Log.d("TEST", "IS EMPTY")
+            userCorrente = User()
+        } else
         // Here we pass the collection name from which we wants the data.
-        mFireStore.collection(Constants.USERS)
-            // The document id to get the Fields of user.
-            .document(getCurrentUserID())
-            .get()
-            .addOnSuccessListener { document ->
-                Log.d("LETTURA DOCUMENTO", document.toString())
+        {
+            mFireStore.collection("users")
+                // The document id to get the Fields of user.
+                .document(getCurrentUserID())
+                .get()
+                .addOnCompleteListener { task ->
+                    Log.d("TEST", "task completato")
+                    if (task.isSuccessful) {
+                        Log.d("TEST", "task CORRETTO")
+                        userCorrente = task.result.toObject(User::class.java)!!
+                    } else {
+                        Log.d("TEST", "errore chiamata")
+                    }
+                }
+        }
 
-                // Here we have received the document snapshot which is converted into the User Data model object.
-                //val loggedInUser = document.toObject(User::class.java)!!
-                //userCorrente = loggedInUser
-                userCorrente = document.toObject(User::class.java)!!
-
-            }
-            .addOnFailureListener { e ->
-                Log.e(
-                    "ERRORE",
-                    "Error while getting loggedIn user details",
-                    e
-                )
-            }
+        return userCorrente
     }
-
 
 
     fun leggiTutteLeFalesie(aggiorna: Aggiorna) {
@@ -166,6 +172,7 @@ class FirestoreClass {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     //val list = ArrayList<Via>()
+                    listaVie.clear()
                     for (document in task.result) {
                         Log.i("*************Vie lette de Firestore", "${document.id}")
                         val via = document.toObject(Via::class.java)
@@ -180,6 +187,29 @@ class FirestoreClass {
                 Log.e("ERRORE", "${e}")
             }
     }
+
+
+    //fun leggiVieScalateUser(userId: String, aggiorna: Aggiorna) {
+    fun leggiVieScalateUser(userId: String) {
+        mFireStore.collection(Constants.USERS)
+            .document(userId)
+            .get()
+            .addOnCompleteListener { task ->
+                Log.d("TEST", "task completato")
+                if (task.isSuccessful) {
+                    Log.d("TEST", "task CORRETTO")
+
+                    val userLetto = task.result.toObject(User::class.java)!!
+                    arrayVieScalateUser = ArrayList(userLetto.vieScalate)
+
+                } else {
+                    Log.d("TEST", "errore chiamata")
+                }
+            }
+
+
+    }
+
 
 }
 

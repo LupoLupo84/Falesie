@@ -40,8 +40,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.falesie.Aggiorna
+import com.example.falesie.MainActivity
+import com.example.falesie.MainActivity.Companion.falesiaSelezionata
 import com.example.falesie.MainActivity.Companion.listaFalesie
 import com.example.falesie.MainActivity.Companion.listaVie
+import com.example.falesie.MainActivity.Companion.listaVieSelezionate
 import com.example.falesie.firestore.FirestoreClass
 import com.example.falesie.model.Falesia
 
@@ -52,6 +55,7 @@ fun FalesieScreen(navController: NavHostController) {
     val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    Log.d("TEST", MainActivity.userCorrente.email)
 
 
     ModalNavigationDrawer(
@@ -71,7 +75,7 @@ fun FalesieScreen(navController: NavHostController) {
                 )
             },
             content = {
-                ListaFalesie(paddingValues = it)
+                ListaFalesie(paddingValues = it, navController)
             }
         )
 
@@ -82,7 +86,7 @@ fun FalesieScreen(navController: NavHostController) {
 }
 
 @Composable
-fun ListaFalesie(paddingValues: PaddingValues) {
+fun ListaFalesie(paddingValues: PaddingValues, navController: NavHostController) {
     var caricamentoCompletato by remember { mutableStateOf(false) }
 
 
@@ -92,7 +96,7 @@ fun ListaFalesie(paddingValues: PaddingValues) {
                 Log.i("Numero di falesie lette nel database", listaFalesie.size.toString())
                 FirestoreClass().leggiTutteLeVie(object : Aggiorna {
                     override fun aggiorna() {
-                        Log.i("Numero di Vie lette nel database", listaVie.size.toString())
+                        Log.i("VIE LETTE IF", listaVie.size.toString())
                         caricamentoCompletato = true
 
                     }
@@ -102,13 +106,19 @@ fun ListaFalesie(paddingValues: PaddingValues) {
             }
         })
     } else {
-        caricamentoCompletato = true
+        FirestoreClass().leggiTutteLeVie(object : Aggiorna {
+            override fun aggiorna() {
+                Log.i("VIE LETTE ELSE", listaVie.size.toString())
+                caricamentoCompletato = true
+
+            }
+        })
     }
 
 
     if (caricamentoCompletato == true) {
         //compilaListaFalesie(paddingValues)
-        RecyclerView(paddingValues)
+        RecyclerView(paddingValues, navController)
     }
 
 
@@ -116,7 +126,7 @@ fun ListaFalesie(paddingValues: PaddingValues) {
 
 
 @Composable
-fun RecyclerView(paddingValues: PaddingValues) {
+fun RecyclerView(paddingValues: PaddingValues, navController: NavHostController) {
 
     LazyColumn(
         modifier = Modifier
@@ -124,7 +134,7 @@ fun RecyclerView(paddingValues: PaddingValues) {
     ) {
 
         items(items = listaFalesie.sortedBy { it.nome }) { falesia ->
-            ListItem(falesia)
+            ListItem(falesia, navController)
         }
 
     }
@@ -136,8 +146,8 @@ fun RecyclerView(paddingValues: PaddingValues) {
 
 
 @Composable
-fun ListItem(falesia: Falesia) {
-    var falesiaSelezionata by remember { mutableStateOf("") }
+fun ListItem(falesia: Falesia, navController: NavHostController) {
+    var pressioneIdFalesia by remember { mutableStateOf("") }
     val expanded = remember { mutableStateOf(false) }
     val extraPadding by animateDpAsState(
         if (expanded.value) 24.dp else 0.dp,
@@ -150,11 +160,12 @@ fun ListItem(falesia: Falesia) {
     Surface(
         color = MaterialTheme.colorScheme.inversePrimary,
         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
-        shape = RoundedCornerShape(10.dp)
+        shape = RoundedCornerShape(10.dp),
+        shadowElevation = 5.dp
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(8.dp)
                 .fillMaxWidth()
         ) {
 
@@ -167,7 +178,8 @@ fun ListItem(falesia: Falesia) {
                     Text(
                         modifier = Modifier
                             .clickable {
-                                falesiaSelezionata = falesia.id
+                                pressioneIdFalesia = falesia.id
+                                falesiaSelezionata = falesia
                                 Log.d("FALESIA SELEZIONATA", falesia.id)
                             },
                         text = falesia.nome, style = MaterialTheme.typography.headlineMedium.copy(
@@ -202,5 +214,20 @@ fun ListItem(falesia: Falesia) {
 
         }
     }
+
+    if (pressioneIdFalesia.isNotEmpty()) {       //falesiaSelezionata id falesia
+
+
+//        when (pressioneIdFalesia) {
+//
+//            falesiaSelezionata.id -> {
+//                //Log.d("SELEZIONE", selectedItems)
+                pressioneIdFalesia = ""
+//                //navController.popBackStack()
+                navController.navigate("VieScreen")
+//            }
+//        }
+    }
+
 
 }

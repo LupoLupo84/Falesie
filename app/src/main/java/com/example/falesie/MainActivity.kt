@@ -4,15 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -20,11 +11,13 @@ import com.example.falesie.firestore.FirestoreClass
 import com.example.falesie.model.Falesia
 import com.example.falesie.model.User
 import com.example.falesie.model.Via
+import com.example.falesie.model.ViaScalata
 import com.example.falesie.screen.LoginScreen
 import com.example.falesie.screen.FalesieScreen
 import com.example.falesie.screen.GestioneFalesieScreen
 import com.example.falesie.screen.ProfiloScreen
 import com.example.falesie.screen.RegisterScreen
+import com.example.falesie.screen.VieScreen
 import com.example.falesie.ui.theme.FalesieTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -40,22 +33,24 @@ class MainActivity : ComponentActivity() {
         var listaFalesie: ArrayList<Falesia> = ArrayList()                  // Tutte le falesie presenti nel db
         var listaVieSelezionate: ArrayList<Via> = ArrayList()               // Vie presenti nella falesia corrente
         var falesiaSelezionata:Falesia = Falesia()                          // Falesia selezionata per la modifica
+        var viaSelezionata : Via = Via()
+        var arrayVieScalateUser: ArrayList<ViaScalata> = ArrayList()
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         val currentUserID = FirestoreClass().getCurrentUserID()
         Log.i("CURRENT USER ID", currentUserID)
 
+        userCorrente = FirestoreClass().firstLoadUserData()
+        Log.d("TEST", userCorrente.email)
+
         var startDestination = ""
-        if (currentUserID.isNotEmpty()) {
-            FirestoreClass().firstLoadUserData()
+        if (currentUserID.isNotEmpty()) {       // se ho caricato i dati dell'utente
             startDestination = "FalesieScreen"
-        } else {
-            userCorrente = User()
+        } else {                                // chiedo di effettuare il login
             startDestination = "LoginScreen"
         }
 
@@ -83,6 +78,9 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("GestioneFalesieScreen") {
                         GestioneFalesieScreen(navController)
+                    }
+                    composable("VieScreen") {
+                        VieScreen(navController)
                     }
 
 

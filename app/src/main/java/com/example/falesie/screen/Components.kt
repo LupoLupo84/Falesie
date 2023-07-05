@@ -75,7 +75,7 @@ fun modalDrawerSheetMenu(navController: NavHostController) {
         MenuItem(id = "Logout", title = "Logout", "Logout", Icons.Filled.Logout, false),
     )
     var selectedItems by remember { mutableStateOf("") }
-    var context = LocalContext.current
+    val context = LocalContext.current
 
 
 
