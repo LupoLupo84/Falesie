@@ -84,7 +84,7 @@ fun LoginScreen(navController: NavHostController) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            modalDrawerSheetMenu(navController = navController)
+            ModalDrawerSheetMenu(navController = navController)
         }
     ) {
 

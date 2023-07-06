@@ -15,7 +15,7 @@ import androidx.navigation.NavHostController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfiloScreen(navController: NavHostController){
+fun DbRoomScreen(navController: NavHostController){
 
     val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
@@ -36,12 +36,12 @@ fun ProfiloScreen(navController: NavHostController){
                     scrollBehaivor = scrollBehaivor,
                     scope = scope,
                     drawerState = drawerState,
-                    titolo = "Profilo"
+                    titolo = "DbRoomScreen"
                 )
             },
             content = {
                 //CustomList(paddingValues = it)
-                ProfiloFrame(paddingValues = it, navController)
+                DbRoomFrame(paddingValues = it, navController)
 
             }
         )
@@ -53,7 +53,6 @@ fun ProfiloScreen(navController: NavHostController){
 
 
 @Composable
-fun ProfiloFrame(paddingValues: PaddingValues, navController: NavHostController){
+fun DbRoomFrame(paddingValues: PaddingValues, navController: NavHostController){
 
 }
-

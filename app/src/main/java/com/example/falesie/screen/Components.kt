@@ -17,9 +17,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BlurLinear
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DataArray
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Divider
@@ -66,13 +68,14 @@ import kotlinx.coroutines.launch
 // Contenuto del manu laterale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun modalDrawerSheetMenu(navController: NavHostController) {
+fun ModalDrawerSheetMenu(navController: NavHostController) {
 
     val listaDeiMenu = listOf(
         MenuItem(id = "Profilo", title = "Profilo", "Profilo", Icons.Filled.Person, false),
         MenuItem(id = "Falesie", title = "Falesie", "Falesie", Icons.Filled.BlurLinear, false),
         MenuItem(id = "GestioneFalesie", title = "GestioneFalesie", "GestioneFalesie", Icons.Filled.Settings, true),
         MenuItem(id = "Logout", title = "Logout", "Logout", Icons.Filled.Logout, false),
+        MenuItem(id = "DbRoom", title = "DbRoom", "DbRoom", Icons.Filled.SaveAlt, true),
     )
     var selectedItems by remember { mutableStateOf("") }
     val context = LocalContext.current
@@ -86,7 +89,7 @@ fun modalDrawerSheetMenu(navController: NavHostController) {
             //horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (FirestoreClass().getCurrentUserID().isNotEmpty()) {
-                drawProfileUser()
+                DrawProfileUser()
             }
 
 
@@ -147,6 +150,12 @@ fun modalDrawerSheetMenu(navController: NavHostController) {
                         navController.popBackStack()
                         navController.navigate("LoginScreen")
                     }
+                    "DbRoom" -> {
+                        Log.d("SELEZIONE", selectedItems)
+                        selectedItems = ""
+                        navController.popBackStack()
+                        navController.navigate("DbRoomScreen")
+                    }
 
 
                 }
@@ -193,7 +202,7 @@ fun topAppBarCustom(
 }
 
 @Composable
-fun drawProfileUser() {
+fun DrawProfileUser() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
