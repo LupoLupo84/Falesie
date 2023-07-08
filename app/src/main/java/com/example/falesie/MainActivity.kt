@@ -5,11 +5,12 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -22,6 +23,8 @@ import com.example.falesie.model.ViaScalata
 import com.example.falesie.room.ContactDatabase
 import com.example.falesie.room.ContactViewModel
 import com.example.falesie.room.Contactscreen
+import com.example.falesie.room.ViarDatabase
+import com.example.falesie.room.ViarViewModel
 import com.example.falesie.screen.DbRoomScreen
 import com.example.falesie.screen.LoginScreen
 import com.example.falesie.screen.FalesieScreen
@@ -48,6 +51,23 @@ class MainActivity : ComponentActivity() {
             object : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return ContactViewModel(db.dao) as T
+                }
+            }
+        }
+    )
+
+    private val dbViar by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            ViarDatabase::class.java,
+            "via.db"
+        ).build()
+    }
+    private val viewModelViar by viewModels<ViarViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return ViarViewModel(dbViar.dao) as T
                 }
             }
         }
@@ -95,9 +115,9 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
-                    //startDestination = startDestination                      //"LoginScreen"
+                    startDestination = startDestination                      //"LoginScreen"
                     //test applicazione
-                    startDestination = "DbRoomScreen"
+                    //startDestination = "DbRoomScreen"
                 ) {
                     composable("LoginScreen") {
                         LoginScreen(navController)
@@ -118,11 +138,11 @@ class MainActivity : ComponentActivity() {
                         VieScreen(navController)
                     }
                     composable("DbRoomScreen") {
-                        //DbRoomScreen(navController)
+                        DbRoomScreen(navController, onEvent = viewModelViar::onEvent)
 
                         //test database room
-                        val state by viewModel.state.collectAsState()
-                        Contactscreen(state = state , onEvent = viewModel::onEvent)
+//                        val state by viewModel.state.collectAsState()
+//                        Contactscreen(state = state , onEvent = viewModel::onEvent)
 
                     }
 

@@ -22,7 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -34,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,7 +42,6 @@ import com.example.falesie.MainActivity
 import com.example.falesie.MainActivity.Companion.falesiaSelezionata
 import com.example.falesie.MainActivity.Companion.listaFalesie
 import com.example.falesie.MainActivity.Companion.listaVie
-import com.example.falesie.MainActivity.Companion.listaVieSelezionate
 import com.example.falesie.firestore.FirestoreClass
 import com.example.falesie.model.Falesia
 
@@ -61,7 +58,7 @@ fun FalesieScreen(navController: NavHostController) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheetMenu(navController = navController)
+            ModalDrawerSheetMenu(navController = navController, null)
         }
     ) {
         Scaffold(

@@ -77,7 +77,7 @@ fun RegisterScreen(navController: NavHostController) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheetMenu(navController = navController)
+            ModalDrawerSheetMenu(navController = navController, null)
         }
     ) {
 

@@ -62,10 +62,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.falesie.MainActivity.Companion.auth
+import com.example.falesie.MainActivity.Companion.userCorrente
 import com.example.falesie.R
 import com.example.falesie.firestore.FirestoreClass
-import com.google.firebase.auth.FirebaseAuth
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,7 +86,7 @@ fun LoginScreen(navController: NavHostController) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheetMenu(navController = navController)
+            ModalDrawerSheetMenu(navController = navController, null)
         }
     ) {
 

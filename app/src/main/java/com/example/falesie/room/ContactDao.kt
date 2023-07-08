@@ -24,3 +24,18 @@ interface ContactDao {
     @Query("SELECT * FROM  contact ORDER BY phoneNumber ASC")
     fun getContactsOrderedByPhoneNumber(): Flow<List<Contact>>
 }
+
+
+
+@Dao
+interface ViarDao {
+    @Upsert
+    suspend fun upsertViar(viar: Viar)
+
+    @Delete
+    suspend fun deleteViar(viar: Viar)
+
+    @Query("SELECT * FROM  viar ORDER BY falesia ASC")
+    fun getViarOrderedByFialesia(): Flow<List<Viar>>
+
+}
