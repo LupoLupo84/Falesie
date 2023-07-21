@@ -36,23 +36,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import androidx.room.Room
 import com.example.falesie.Aggiorna
 import com.example.falesie.MainActivity
 import com.example.falesie.MainActivity.Companion.falesiaSelezionata
 import com.example.falesie.MainActivity.Companion.listaFalesie
 import com.example.falesie.MainActivity.Companion.listaVie
+import com.example.falesie.MainActivity.Companion.userCorrente
 import com.example.falesie.firestore.FirestoreClass
 import com.example.falesie.model.Falesia
+import com.example.falesie.room.ContactDao
+import com.example.falesie.room.ViarDao
+import com.example.falesie.room.ViarDatabase
+import com.example.falesie.room.ViarEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FalesieScreen(navController: NavHostController) {
+fun FalesieScreen(
+    navController: NavHostController,
+    onEvent: (ViarEvent) -> Unit,
+    dbViar: ViarDatabase
+){
+
     val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    Log.d("TEST", MainActivity.userCorrente.email)
+    Log.d("TEST", userCorrente.email)
 
 
     ModalNavigationDrawer(
@@ -72,7 +89,7 @@ fun FalesieScreen(navController: NavHostController) {
                 )
             },
             content = {
-                ListaFalesie(paddingValues = it, navController)
+                ListaFalesie(paddingValues = it, navController, onEvent, dbViar)
             }
         )
 
@@ -83,34 +100,52 @@ fun FalesieScreen(navController: NavHostController) {
 }
 
 @Composable
-fun ListaFalesie(paddingValues: PaddingValues, navController: NavHostController) {
+fun ListaFalesie(
+    paddingValues: PaddingValues,
+    navController: NavHostController,
+    onEvent: (ViarEvent) -> Unit,
+    dbViar: ViarDatabase
+) {
+    val dao: ViarDao
     var caricamentoCompletato by remember { mutableStateOf(false) }
 
+    //onEvent(ViarEvent.SaveViar)
+    var vieRoom = dbViar.dao.getViarOrderedByFialesia()
+    //dbViar.dao.getViarOrderedByFialesia()
 
-    if (listaFalesie.size < 1) {
-        FirestoreClass().leggiTutteLeFalesie(object : Aggiorna {
-            override fun aggiorna() {
-                Log.i("Numero di falesie lette nel database", listaFalesie.size.toString())
-                FirestoreClass().leggiTutteLeVie(object : Aggiorna {
-                    override fun aggiorna() {
-                        Log.i("VIE LETTE IF", listaVie.size.toString())
-                        caricamentoCompletato = true
-
-                    }
-                })
+//    CoroutineScope(Dispatchers.Main).launch {
+//        vieRoom.collect{
+//            Log.i("VIE LETTE vieRoom", it.)
+//        }
+//    }
 
 
-            }
-        })
-    } else {
-        FirestoreClass().leggiTutteLeVie(object : Aggiorna {
-            override fun aggiorna() {
-                Log.i("VIE LETTE ELSE", listaVie.size.toString())
-                caricamentoCompletato = true
 
-            }
-        })
-    }
+
+//    if (listaFalesie.size < 1) {
+//        FirestoreClass().leggiTutteLeFalesie(object : Aggiorna {
+//            override fun aggiorna() {
+//                Log.i("Numero di falesie lette nel database", listaFalesie.size.toString())
+//                FirestoreClass().leggiTutteLeVie(object : Aggiorna {
+//                    override fun aggiorna() {
+//                        Log.i("VIE LETTE IF", listaVie.size.toString())
+//                        caricamentoCompletato = true
+//
+//                    }
+//                })
+//
+//
+//            }
+//        })
+//    } else {
+//        FirestoreClass().leggiTutteLeVie(object : Aggiorna {
+//            override fun aggiorna() {
+//                Log.i("VIE LETTE ELSE", listaVie.size.toString())
+//                caricamentoCompletato = true
+//
+//            }
+//        })
+//    }
 
 
     if (caricamentoCompletato == true) {

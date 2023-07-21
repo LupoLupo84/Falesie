@@ -1,14 +1,23 @@
 package com.example.falesie
 
+//tutorial rooms db jetpack
+//https://www.youtube.com/watch?v=voMTReNRvUA&list=PLUPcj46QWTDWlxtIwE3A6VEWUFEO8nh0Z&index=7
+
 import android.os.Bundle
 import android.util.Log
+import android.view.Surface
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
@@ -32,6 +41,8 @@ import com.example.falesie.screen.GestioneFalesieScreen
 import com.example.falesie.screen.ProfiloScreen
 import com.example.falesie.screen.RegisterScreen
 import com.example.falesie.screen.VieScreen
+import com.example.falesie.ui.JetShopingNavigation
+import com.example.falesie.ui.home.HomeScreen
 import com.example.falesie.ui.theme.FalesieTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -110,44 +121,55 @@ class MainActivity : ComponentActivity() {
             FalesieTheme() {
 
 
-
-
-                val navController = rememberNavController()
-                NavHost(
-                    navController = navController,
-                    startDestination = startDestination                      //"LoginScreen"
-                    //test applicazione
-                    //startDestination = "DbRoomScreen"
-                ) {
-                    composable("LoginScreen") {
-                        LoginScreen(navController)
-                    }
-                    composable("FalesieScreen") {
-                        FalesieScreen(navController)
-                    }
-                    composable("RegisterScreen") {
-                        RegisterScreen(navController)
-                    }
-                    composable("ProfiloScreen") {
-                        ProfiloScreen(navController)
-                    }
-                    composable("GestioneFalesieScreen") {
-                        GestioneFalesieScreen(navController)
-                    }
-                    composable("VieScreen") {
-                        VieScreen(navController)
-                    }
-                    composable("DbRoomScreen") {
-                        DbRoomScreen(navController, onEvent = viewModelViar::onEvent)
-
-                        //test database room
-//                        val state by viewModel.state.collectAsState()
-//                        Contactscreen(state = state , onEvent = viewModel::onEvent)
-
-                    }
-
-
+                //MODIFICHE PER TEST
+                Surface(modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background)
+                {
+                    //HomeScreen(onNavigate = {})      //navigationHost
+                    JetShoppingApp()
                 }
+
+
+
+
+
+
+//                val navController = rememberNavController()
+//                NavHost(
+//                    navController = navController,
+//                    startDestination = startDestination                      //"LoginScreen"
+//                    //test applicazione
+//                    //startDestination = "DbRoomScreen"
+//                ) {
+//                    composable("LoginScreen") {
+//                        LoginScreen(navController)
+//                    }
+//                    composable("FalesieScreen") {
+//                        //FalesieScreen(navController, onEvent = viewModelViar::onEvent)
+//                    }
+//                    composable("RegisterScreen") {
+//                        RegisterScreen(navController)
+//                    }
+//                    composable("ProfiloScreen") {
+//                        ProfiloScreen(navController)
+//                    }
+//                    composable("GestioneFalesieScreen") {
+//                        GestioneFalesieScreen(navController)
+//                    }
+//                    composable("VieScreen") {
+//                        VieScreen(navController)
+//                    }
+//                    composable("DbRoomScreen") {
+//                        DbRoomScreen(navController, onEvent = viewModelViar::onEvent)
+//
+//                        //test database room
+////                        val state by viewModel.state.collectAsState()
+////                        Contactscreen(state = state , onEvent = viewModel::onEvent)
+//
+//                    }
+//
+//
+//                }
 
 
             }
@@ -155,5 +177,9 @@ class MainActivity : ComponentActivity() {
 
     }
 
+    @Composable
+    fun JetShoppingApp(){
+        JetShopingNavigation()
+    }
 
 }
