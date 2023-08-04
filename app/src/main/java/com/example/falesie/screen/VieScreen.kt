@@ -1,6 +1,7 @@
 package com.example.falesie.screen
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -8,6 +9,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -19,19 +21,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Abc
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,21 +54,41 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.falesie.MainActivity.Companion.arrayVieScalateUser
-import com.example.falesie.MainActivity.Companion.falesiaSelezionata
-import com.example.falesie.MainActivity.Companion.listaVie
-import com.example.falesie.MainActivity.Companion.listaVieSelezionate
 import com.example.falesie.MainActivity.Companion.userCorrente
-import com.example.falesie.MainActivity.Companion.viaSelezionata
-import com.example.falesie.model.Via
+import com.example.falesie.data.room.models.Falesia
+import com.example.falesie.data.room.models.Via
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VieScreen(navController: NavHostController) {
+fun VieScreen(navController: NavHostController, falesia: Falesia) {
+
+    val viewModelVia = viewModel<FalesieViewModel>(factory = FalesieViewModelFactory())
+    val vieState = viewModelVia.state
+
+    var vieNellaFalesia: MutableList<Via> = ArrayList()
+
+    for (i in vieState.items) {
+        if (i.falesiaIdFk == falesia.id) {
+            vieNellaFalesia.add(i)
+        }
+    }
+
+    vieNellaFalesia.sortBy { it.numero }
+
+
+
+
+
     for (i in userCorrente.vieScalate) {
         arrayVieScalateUser.add(i)
     }
@@ -76,17 +108,18 @@ fun VieScreen(navController: NavHostController) {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehaivor.nestedScrollConnection),
             topBar = {
-                topAppBarCustom(
+                topAppBarFalesia(
                     scrollBehaivor = scrollBehaivor,
                     scope = scope,
                     drawerState = drawerState,
                     //titolo = "Vie"
-                    titolo = falesiaSelezionata.nome
+                    titolo = falesia.nome,
+                    vieNellaFalesia
                 )
             },
             content = {
                 //CustomList(paddingValues = it)
-                ListaVie(paddingValues = it, navController)
+                ListaVie(paddingValues = it, navController, falesia, vieNellaFalesia)
 
             }
         )
@@ -98,21 +131,24 @@ fun VieScreen(navController: NavHostController) {
 
 
 @Composable
-fun ListaVie(paddingValues: PaddingValues, navController: NavHostController) {
-
-    //Log.d("TEST VIE", listaVie.size.toString())
-    // cerca in listaVie le vie facente parte della falesia
-    listaVieSelezionate =
-        ArrayList()       // svuota l'array delle vie presenti nella falesia corrente
-    for (i in listaVie) {
-        if (i.falesia == falesiaSelezionata.id) {
-            listaVieSelezionate.add(i)
-        }
-    }
-    listaVieSelezionate.sortBy { list -> list.numero }
-
-    //var listaSettore: ArrayList<Via> = ArrayList()
-    //var settore = ""
+fun ListaVie(
+    paddingValues: PaddingValues,
+    navController: NavHostController,
+    falesia: Falesia,
+    vieNellaFalesia: MutableList<Via>
+) {
+//    val viewModelVia = viewModel<FalesieViewModel>(factory = FalesieViewModelFactory())
+//    val vieState = viewModelVia.state
+//
+//    var vieNellaFalesia: MutableList<Via> = ArrayList()
+//
+//    for (i in vieState.items) {
+//        if (i.falesiaIdFk == falesia.id) {
+//            vieNellaFalesia.add(i)
+//        }
+//    }
+//
+//    vieNellaFalesia.sortBy { it.numero }
 
 
     LazyColumn(
@@ -121,10 +157,9 @@ fun ListaVie(paddingValues: PaddingValues, navController: NavHostController) {
     ) {
 
 
-        items(items = listaVieSelezionate.sortedBy { it.numero }) { via ->
+        items(items = vieNellaFalesia.sortedBy { it.numero }) { via ->
             ListItem(via, navController)
         }
-
 
 
     }
@@ -149,7 +184,7 @@ fun ListItem(via: Via, navController: NavHostController) {
 
 
     Surface(
-        color = MaterialTheme.colorScheme.inversePrimary,
+        color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
         shape = RoundedCornerShape(10.dp),
         shadowElevation = 2.dp
@@ -163,8 +198,10 @@ fun ListItem(via: Via, navController: NavHostController) {
 
             var viaPresente = false
 
-            val bordoON = BorderStroke(width = 3.dp, color = MaterialTheme.colorScheme.primary)
-            val bordoOFF = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.secondary)
+            val bordoON =
+                BorderStroke(width = 3.dp, color = MaterialTheme.colorScheme.inversePrimary)
+            val bordoOFF =
+                BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.inverseSurface)
             //var bordo = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.secondary)
             var bordo by remember { mutableStateOf(bordoOFF) }
             //var stella = Icons.Default.StarBorder
@@ -197,7 +234,6 @@ fun ListItem(via: Via, navController: NavHostController) {
                         fontSize = 8.sp,
                         text = "ID: ${via.id}"
                     )
-
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column() {
                             Text(
@@ -211,10 +247,10 @@ fun ListItem(via: Via, navController: NavHostController) {
                             Text(
                                 modifier = Modifier
                                     .clickable {
-                                        viaSelezionata = via
+                                        //viaSelezionata = via
                                         Log.d("FALESIA SELEZIONATA", via.id)
                                     },
-                                text = via.nome,
+                                text = via.viaName,
                                 style = MaterialTheme.typography.titleLarge.copy(
                                     fontWeight = FontWeight.Bold
                                 )
@@ -222,17 +258,17 @@ fun ListItem(via: Via, navController: NavHostController) {
                         }
 
                     }
-
-
                 }
 
                 OutlinedButton(
                     border = bordo,
                     onClick = { expanded.value = !expanded.value }
                 ) {
-                    Text(if (expanded.value) "${via.grado} ▲" else "${via.grado} ▼")
+                    Text(
+                        if (expanded.value) "${via.grado} ▲" else "${via.grado} ▼",
+                        color = MaterialTheme.colorScheme.inversePrimary
+                    )
                 }
-
             }
 
             if (expanded.value) {
@@ -245,11 +281,10 @@ fun ListItem(via: Via, navController: NavHostController) {
                     Row() {
                         Column(modifier = Modifier.weight(1f)) {
                             Row() {
-                                var altezza =via.altezza
                                 if (via.altezza == 0) {
                                     Text(text = "Altezza ")
                                     Text(text = "---")
-                                }else{
+                                } else {
                                     Text(text = "Altezza ")
                                     Text(
                                         text = "${via.altezza}m",
@@ -261,13 +296,13 @@ fun ListItem(via: Via, navController: NavHostController) {
                             }
                             Row() {
 //                                if (via.protezioni > 0) {
-                                    Text(text = "Protezioni ")
-                                    Text(
-                                        text = "${via.protezioni}",
-                                        style = MaterialTheme.typography.titleMedium.copy(
-                                            fontWeight = FontWeight.Bold
-                                        )
+                                Text(text = "Protezioni ")
+                                Text(
+                                    text = "${via.protezioni}",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontWeight = FontWeight.Bold
                                     )
+                                )
 //                                }
                             }
 
@@ -293,29 +328,28 @@ fun ListItem(via: Via, navController: NavHostController) {
 //                            }
 
                             Icon(
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .combinedClickable(
-                                            onClick = { Log.d("TEST", "CLICK PRESS") },
-                                            onLongClick = {
-                                                Log.d("TEST", "LONG CLICK PRESS")
-                                                if (stella == stellaOFF) {
-                                                    stella = stellaON
-                                                    bordo = bordoON
-                                                }else{
-                                                    stella = stellaOFF
-                                                    bordo = bordoOFF
-                                                }
-                                                //onLongClickIcon(via = via)
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .combinedClickable(
+                                        onClick = { Log.d("TEST", "CLICK PRESS") },
+                                        onLongClick = {
+                                            Log.d("TEST", "LONG CLICK PRESS")
+                                            if (stella == stellaOFF) {
+                                                stella = stellaON
+                                                bordo = bordoON
+                                            } else {
+                                                stella = stellaOFF
+                                                bordo = bordoOFF
                                             }
-                                        ),
-                                    imageVector = stella,
-                                    contentDescription = "stella"
-                                )
+                                            //onLongClickIcon(via = via)
+                                        }
+                                    ),
+                                imageVector = stella,
+                                contentDescription = "stella"
+                            )
                         }
 
                     }
-
 
 
                     //TODO se l'utente ha già scalato la via aggiungi il divisore e le ripetizioni
@@ -351,11 +385,132 @@ fun ListItem(via: Via, navController: NavHostController) {
     }
 
 
-
-
 }
 
 
-fun onLongClickIcon(via: Via,){
+fun onLongClickIcon(via: Via) {
     //Aggiungi la via alle vie scalate user
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun topAppBarFalesia(
+    scrollBehaivor: TopAppBarScrollBehavior,
+    scope: CoroutineScope,
+    drawerState: DrawerState,
+    titolo: String,
+    vieNellaFalesia: MutableList<Via>
+) {
+    TopAppBar(
+        scrollBehavior = scrollBehaivor,
+        navigationIcon = {
+            IconButton(onClick = {
+                scope.launch {
+                    drawerState.open()
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu Icon"
+                )
+            }
+        },
+        title = {
+            Text(text = titolo)
+        },
+        actions = { SelezionaSettori(vieNellaFalesia) }
+
+    )
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SelezionaSettori(vieNellaFalesia: MutableList<Via>) {
+    val expandedSettori = remember { mutableStateOf(false) }
+    val extraPaddingSettori by animateDpAsState(
+        if (expandedSettori.value) 24.dp else 0.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        )
+    )
+
+
+    IconButton(
+        modifier = Modifier.padding(start = 45.dp),
+        onClick = {
+            expandedSettori.value = !expandedSettori.value
+            Log.d("MENU_ITEM", "Click su Seleziona Settori ${expandedSettori.value}")
+        }
+    ) {
+        Icon(
+            imageVector = Icons.Default.Abc,
+            contentDescription = "Scegli settore"
+        )
+    }
+    if (expandedSettori.value) {
+
+        var settori: ArrayList<String> = arrayListOf()
+
+        vieNellaFalesia.sortBy { it.settore }
+        var settore = ""
+        for (i in vieNellaFalesia){
+            if (i.settore != settore){
+                settore = i.settore
+                settori.add(i.settore)
+            }
+        }
+
+        //Demo_ExposedDropdownMenuBox()
+        val context = LocalContext.current
+        //val settori = arrayOf("Americano", "Cappuccino", "Espresso", "Latte", "Mocha")
+        var expanded by remember { mutableStateOf(false) }
+        var selectedText by remember { mutableStateOf(settori[0]) }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+            //.padding(32.dp)
+        ) {
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = {
+                    expanded = !expanded
+                }
+            ) {
+                TextField(
+                    value = selectedText,
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier.menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    settori.forEach { item ->
+                        DropdownMenuItem(
+                            text = { Text(text = item) },
+                            onClick = {
+                                selectedText = item
+                                expanded = false
+                                Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
+                                expandedSettori.value = !expandedSettori.value
+
+                                // ritorna alla funzione chiamante il filtro per visualizzare
+                                // solo le vie nella falesia selezionata
+
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+}
+

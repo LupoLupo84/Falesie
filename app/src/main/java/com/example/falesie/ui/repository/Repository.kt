@@ -1,16 +1,22 @@
 package com.example.falesie.ui.repository
 
+import com.example.falesie.data.room.FalesiaDao
 import com.example.falesie.data.room.ItemDao
 import com.example.falesie.data.room.ListDao
 import com.example.falesie.data.room.StoreDao
+import com.example.falesie.data.room.ViaDao
+import com.example.falesie.data.room.models.Falesia
 import com.example.falesie.data.room.models.Item
 import com.example.falesie.data.room.models.ShoppingList
 import com.example.falesie.data.room.models.Store
+import com.example.falesie.data.room.models.Via
 
 class Repository(
     private val listDao: ListDao,
     private val storeDao: StoreDao,
-    private val itemDao: ItemDao
+    private val itemDao: ItemDao,
+    private val viaDao: ViaDao,
+    private val falesiaDao: FalesiaDao
 ) {
 
     val store = storeDao.getAllStores()
@@ -41,6 +47,24 @@ class Repository(
     }
 
 
+
+    val storeVie = viaDao.getAllVie()
+    suspend fun insertVia(via: Via){
+        viaDao.insert(via)
+    }
+
+    suspend fun deleteVia(via: Via){
+        viaDao.delete(via)
+    }
+
+    suspend fun updateVia(via: Via){
+        viaDao.update(via)
+    }
+
+    val storeFalesie = falesiaDao.getAllFalesie()
+    suspend fun insertFalesia(falesia: Falesia){
+        falesiaDao.insert(falesia)
+    }
 
 
 }

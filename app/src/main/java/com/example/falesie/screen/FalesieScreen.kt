@@ -1,5 +1,6 @@
 package com.example.falesie.screen
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -12,12 +13,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddLocation
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedButton
@@ -32,39 +38,52 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.room.Room
 import com.example.falesie.Aggiorna
-import com.example.falesie.MainActivity
-import com.example.falesie.MainActivity.Companion.falesiaSelezionata
+import com.example.falesie.Graph.repository
 import com.example.falesie.MainActivity.Companion.listaFalesie
 import com.example.falesie.MainActivity.Companion.listaVie
 import com.example.falesie.MainActivity.Companion.userCorrente
+import com.example.falesie.data.room.models.Falesia
+import com.example.falesie.data.room.models.Via
 import com.example.falesie.firestore.FirestoreClass
-import com.example.falesie.model.Falesia
-import com.example.falesie.room.ContactDao
-import com.example.falesie.room.ViarDao
-import com.example.falesie.room.ViarDatabase
 import com.example.falesie.room.ViarEvent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
+
+var falesiaSelected = Falesia(
+    "",
+    "",
+    "",
+    "",
+    "",
+    0,
+    0,
+    false,
+    false,
+    false,
+    false,
+
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FalesieScreen(
     navController: NavHostController,
-    onEvent: (ViarEvent) -> Unit,
-    dbViar: ViarDatabase
-){
+    onEvent: (ViarEvent) -> Unit
+) {
+
+
+    //val viewModel = viewModel<FalesieViewModel>(factory = FalesieViewModelFactory())
+    //Log.d("TEST size storelistvie", viewModel.state.storeListVie.size.toString())
 
     val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
@@ -75,7 +94,7 @@ fun FalesieScreen(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheetMenu(navController = navController, null)
+            ModalDrawerSheetMenu(navController = navController, onEvent)
         }
     ) {
         Scaffold(
@@ -89,7 +108,7 @@ fun FalesieScreen(
                 )
             },
             content = {
-                ListaFalesie(paddingValues = it, navController, onEvent, dbViar)
+                ListaFalesie(paddingValues = it, navController)
             }
         )
 
@@ -99,86 +118,138 @@ fun FalesieScreen(
 
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ListaFalesie(
     paddingValues: PaddingValues,
     navController: NavHostController,
-    onEvent: (ViarEvent) -> Unit,
-    dbViar: ViarDatabase
 ) {
-    val dao: ViarDao
-    var caricamentoCompletato by remember { mutableStateOf(false) }
 
-    //onEvent(ViarEvent.SaveViar)
-    var vieRoom = dbViar.dao.getViarOrderedByFialesia()
-    //dbViar.dao.getViarOrderedByFialesia()
-
-//    CoroutineScope(Dispatchers.Main).launch {
-//        vieRoom.collect{
-//            Log.i("VIE LETTE vieRoom", it.)
-//        }
-//    }
+    //salvaDbVieInLocale()
+    //salvaDbFalesieInLocale()
 
 
+    val viewModelVia = viewModel<FalesieViewModel>(factory = FalesieViewModelFactory())
+    val vieState = viewModelVia.state
+    val falesieState = viewModelVia.stateFalesie
 
+    var listaTempFalesie: MutableList<Falesia> = ArrayList()
 
-//    if (listaFalesie.size < 1) {
-//        FirestoreClass().leggiTutteLeFalesie(object : Aggiorna {
-//            override fun aggiorna() {
-//                Log.i("Numero di falesie lette nel database", listaFalesie.size.toString())
-//                FirestoreClass().leggiTutteLeVie(object : Aggiorna {
-//                    override fun aggiorna() {
-//                        Log.i("VIE LETTE IF", listaVie.size.toString())
-//                        caricamentoCompletato = true
-//
-//                    }
-//                })
-//
-//
-//            }
-//        })
-//    } else {
-//        FirestoreClass().leggiTutteLeVie(object : Aggiorna {
-//            override fun aggiorna() {
-//                Log.i("VIE LETTE ELSE", listaVie.size.toString())
-//                caricamentoCompletato = true
-//
-//            }
-//        })
-//    }
-
-
-    if (caricamentoCompletato == true) {
-        //compilaListaFalesie(paddingValues)
-        RecyclerView(paddingValues, navController)
+    for (i in falesieState.items){
+        listaTempFalesie.add(i)
     }
 
+    listaTempFalesie.sortBy { it.nome }
 
-}
 
 
-@Composable
-fun RecyclerView(paddingValues: PaddingValues, navController: NavHostController) {
 
-    LazyColumn(
-        modifier = Modifier
-            .padding(top = paddingValues.calculateTopPadding())
-    ) {
+    Scaffold()
+    {
+        LazyColumn(
+            modifier = Modifier
+                .padding(top = paddingValues.calculateTopPadding())
+        ) {
 
-        items(items = listaFalesie.sortedBy { it.nome }) { falesia ->
-            ListItem(falesia, navController)
+            items(listaTempFalesie) { falesia ->
+                ListItem(falesia, navController)
+            }
+
+
+
+
         }
 
+
     }
+
 
 }
 
-//tutorial
-//https://www.youtube.com/watch?v=q7qHRnzcfEQ
+
+@Composable
+fun salvaDbVieInLocale() {
+    //USATA PER SALVARE IL DATABASE DI RETE NEL DATABASE LOCALE
+    var caricamentoCompletato by remember { mutableStateOf(false) }
+    FirestoreClass().leggiTutteLeVie(object : Aggiorna {
+        override fun aggiorna() {
+            Log.i("VIE LETTE ELSE", listaVie.size.toString())
+            caricamentoCompletato = true
+        }
+    })
+    if (caricamentoCompletato == true) {
+        //compilaListaFalesie(paddingValues)
+        //RecyclerView(paddingValues, navController)
+        //SALVA LE VIE NEL DATABASE LOCALE ROOM
+        salvaVieInLocale()
+    }
+}
+
+@Composable
+fun salvaDbFalesieInLocale() {
+    //USATA PER SALVARE IL DATABASE DI RETE NEL DATABASE LOCALE
+    var caricamentoCompletato by remember { mutableStateOf(false) }
+    FirestoreClass().leggiTutteLeFalesie(object : Aggiorna {
+        override fun aggiorna() {
+            Log.i("FALESIE LETTE ELSE", listaFalesie.size.toString())
+            caricamentoCompletato = true
+        }
+    })
+    if (caricamentoCompletato == true) {
+
+        //SALVA LE VIE NEL DATABASE LOCALE ROOM
+        salvaFalesieInLocale()
+    }
+}
+
+
+fun salvaVieInLocale() {
+    for (i in listaVie) {
+        var viaRoom = Via(
+            id = i.id,
+            viaName = i.nome,
+            settore = i.settore,
+            numero = i.numero,
+            falesiaIdFk = i.falesia,
+            grado = i.grado,
+            protezioni = i.protezioni,
+            altezza = i.altezza,
+            immagine = i.immagine,
+            isChecked = false
+        )
+        //repository.insertVia(viaRoom)
+        runBlocking { repository.insertVia(viaRoom) }
+    }
+}
+
+fun salvaFalesieInLocale() {
+    for (i in listaFalesie) {
+        var falesiaRoom = com.example.falesie.data.room.models.Falesia(
+            id = i.id,
+            nome = i.nome,
+            descrizione = i.descrizione,
+            latitudine = i.latitudine,
+            longitudine = i.longitudine,
+            stagioni = i.stagioni,
+            altitudine = i.altitudine,
+            primavera = i.primavera,
+            estate = i.estate,
+            autunno = i.autunno,
+            inverno = i.inverno
+        )
+        //repository.insertVia(viaRoom)
+        runBlocking { repository.insertFalesia(falesiaRoom) }
+    }
+}
+
+
+
+
+
 
 
 @Composable
-fun ListItem(falesia: Falesia, navController: NavHostController) {
+fun ListItem(falesia: com.example.falesie.data.room.models.Falesia, navController: NavHostController) {
     var pressioneIdFalesia by remember { mutableStateOf("") }
     val expanded = remember { mutableStateOf(false) }
     val extraPadding by animateDpAsState(
@@ -190,7 +261,7 @@ fun ListItem(falesia: Falesia, navController: NavHostController) {
     )
 
     Surface(
-        color = MaterialTheme.colorScheme.inversePrimary,
+        color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
         shape = RoundedCornerShape(10.dp),
         shadowElevation = 5.dp
@@ -206,15 +277,16 @@ fun ListItem(falesia: Falesia, navController: NavHostController) {
                     modifier = Modifier
                         .weight(1f)
                 ) {
-                    Text(text = "Falesia")
                     Text(
                         modifier = Modifier
                             .clickable {
                                 pressioneIdFalesia = falesia.id
-                                falesiaSelezionata = falesia
+                                //falesiaSelezionata = falesia
+                                falesiaSelected = falesia
                                 Log.d("FALESIA SELEZIONATA", falesia.id)
                             },
-                        text = falesia.nome, style = MaterialTheme.typography.headlineMedium.copy(
+                        text = falesia.nome,
+                        style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold
                         )
                     )
@@ -222,10 +294,11 @@ fun ListItem(falesia: Falesia, navController: NavHostController) {
                 }
 
                 OutlinedButton(onClick = { expanded.value = !expanded.value }) {
-                    Text(if (expanded.value) "Comprimi" else "Espandi")
+                    Text(if (expanded.value) "Comprimi" else "Espandi", color = MaterialTheme.colorScheme.inversePrimary)
                 }
 
             }
+
 
             if (expanded.value) {
                 Column(
@@ -234,12 +307,64 @@ fun ListItem(falesia: Falesia, navController: NavHostController) {
                             bottom = extraPadding.coerceAtLeast(0.dp)
                         )
                 ) {
-                    if (falesia.altitudine > 0) Text(text = "Altitudine " + falesia.altitudine + "m")
-                    if (falesia.latitudine.isNotEmpty()) Text(text = "Lat. " + falesia.latitudine)
-                    if (falesia.longitudine.isNotEmpty()) Text(text = "Lon. " + falesia.longitudine)
-                    Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.primary)
+                    //if (falesia.altitudine > 0) Text(text = "Altitudine " + falesia.altitudine + "m")
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                            .wrapContentHeight()
+                    ) {
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (falesia.latitudine.isNotEmpty() && falesia.longitudine.isNotEmpty()) {
+                                Icon(
+                                    modifier = Modifier.size(48.dp),
+                                    imageVector = Icons.Default.LocationOn,
+                                    contentDescription = null
+                                )
+                                Column(
+                                    modifier = Modifier.padding(start = 6.dp)
+                                ) {
+                                    Text(
+                                        text = "Lat. " + falesia.latitudine,
+                                        fontSize = 12.sp
+                                    )
+                                    Text(
+                                        text = "Lon. " + falesia.longitudine,
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                                Column(
+                                ) {
+                                    if (falesia.altitudine > 0) {
+                                        Text(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            textAlign = TextAlign.End,
+                                            text = "Altitudine " + falesia.altitudine + "m",
+                                            fontSize = 18.sp,
+                                            style = MaterialTheme.typography.headlineMedium.copy(
+                                                fontWeight = FontWeight.Bold)
+                                        )
+                                    }
+                                }
+                            }
+
+                    }
+                    Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.inversePrimary)
                     Spacer(modifier = Modifier.size(6.dp))
                     if (falesia.descrizione.isNotEmpty()) Text(text = falesia.descrizione)
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.End,
+                        text = "Id: ${falesia.id}",
+                        fontSize = 8.sp
+                    )
                 }
 
             }

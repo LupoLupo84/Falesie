@@ -7,6 +7,8 @@ class JetShoppingApplication:Application() {
     override fun onCreate() {
         super.onCreate()
         Graph.provide(this)
+        Graph.provideVie(this)
+        Graph.provideFalesie(this)
         Log.d("APPLICAZIONE", "IN JETSHOPPINGAPP")
 
 

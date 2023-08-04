@@ -42,3 +42,8 @@ abstract class ShoppingListDatabase:RoomDatabase() {
 
 
 }
+
+
+
+
+

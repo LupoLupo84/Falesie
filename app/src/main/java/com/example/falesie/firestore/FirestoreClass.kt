@@ -16,9 +16,14 @@ import com.example.falesie.R
 import com.example.falesie.model.Falesia
 import com.example.falesie.model.User
 import com.example.falesie.model.Via
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
+import java.util.concurrent.TimeUnit
 
 
 class FirestoreClass {
@@ -118,31 +123,50 @@ class FirestoreClass {
     //fun firstLoadUserData(aggiorna: Aggiorna) {
     fun firstLoadUserData(): User {
 
-        userCorrente = User()
+        lateinit var userRitorno: User
+        //userCorrente = User()
         Log.d("TEST", "ingresso nella funzione")
         Log.d("TEST", getCurrentUserID())
         if (getCurrentUserID().isEmpty()) {
             Log.d("TEST", "IS EMPTY")
             userCorrente = User()
+            userRitorno = User()
         } else
         // Here we pass the collection name from which we wants the data.
         {
-            mFireStore.collection("users")
-                // The document id to get the Fields of user.
-                .document(getCurrentUserID())
-                .get()
-                .addOnCompleteListener { task ->
-                    Log.d("TEST", "task completato")
-                    if (task.isSuccessful) {
-                        Log.d("TEST", "task CORRETTO")
-                        userCorrente = task.result.toObject(User::class.java)!!
-                    } else {
-                        Log.d("TEST", "errore chiamata")
-                    }
-                }
-        }
 
-        return userCorrente
+            runBlocking {
+                var lettura = mFireStore.collection("users")
+                    .document(getCurrentUserID())
+                    .get()
+
+                var let = lettura.await()
+                userRitorno = let.toObject(User::class.java)!!
+
+//                mFireStore.collection("users")
+//                    // The document id to get the Fields of user.
+//                    .document(getCurrentUserID())
+//                    .get()
+//                    .addOnCompleteListener { task ->
+//                        Log.d("TEST", "task completato")
+//                        if (task.isSuccessful) {
+//                            Log.d("TEST", "task CORRETTO")
+//                            Log.d("TEST", task.result.toString())
+//                            //var testUser = task.result.toObject(User::class.java)
+//                            userRitorno = task.result.toObject(User::class.java)!!
+//                            //Log.d("TEST", "${testUser?.email.toString()}")
+//                        } else {
+//                            Log.d("TEST", "errore chiamata")
+//                        }
+//                    }
+//                    .addOnFailureListener {
+//                        Log.d("TEST", "on failure")
+//
+//                    }
+            }
+        }
+        Log.d("TEST", "task SALTATO")
+        return userRitorno
     }
 
 
