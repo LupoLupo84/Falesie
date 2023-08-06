@@ -71,7 +71,6 @@ var falesiaSelected = Falesia(
     false,
     false,
     false,
-
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -257,7 +256,7 @@ fun ListItem(falesia: com.example.falesie.data.room.models.Falesia, navControlle
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
-        )
+        ), label = ""
     )
 
     Surface(
@@ -294,7 +293,9 @@ fun ListItem(falesia: com.example.falesie.data.room.models.Falesia, navControlle
                 }
 
                 OutlinedButton(onClick = { expanded.value = !expanded.value }) {
-                    Text(if (expanded.value) "Comprimi" else "Espandi", color = MaterialTheme.colorScheme.inversePrimary)
+                    Text(if (expanded.value) "Comprimi ▲" else "Espandi ▼", color = MaterialTheme.colorScheme.inversePrimary)
+
+                    //if (expanded.value) "${via.grado} ▲" else "${via.grado} ▼",
                 }
 
             }
