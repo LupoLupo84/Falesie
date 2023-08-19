@@ -94,9 +94,9 @@ class MainActivity : ComponentActivity() {
         //var userCorrente = FirestoreClass().firstLoadUserData()
         var listaVie: ArrayList<Via> = ArrayList()                          // Tutte le vie presenti nel db
         var listaFalesie: ArrayList<Falesia> = ArrayList()                  // Tutte le falesie presenti nel db
-        var listaVieSelezionate: ArrayList<Via> = ArrayList()               // Vie presenti nella falesia corrente
-        var falesiaSelezionata:Falesia = Falesia()                          // Falesia selezionata per la modifica
-        var viaSelezionata : Via = Via()
+//        var listaVieSelezionate: ArrayList<Via> = ArrayList()               // Vie presenti nella falesia corrente
+//        var falesiaSelezionata:Falesia = Falesia()                          // Falesia selezionata per la modifica
+//        var viaSelezionata : Via = Via()
         var arrayVieScalateUser: ArrayList<ViaScalata> = ArrayList()
     }
 

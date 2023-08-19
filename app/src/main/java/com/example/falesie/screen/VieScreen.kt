@@ -1,5 +1,6 @@
 package com.example.falesie.screen
 
+import android.os.Build
 import android.util.Log
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -8,6 +9,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,6 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -38,19 +42,19 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -62,8 +66,29 @@ import com.example.falesie.MainActivity.Companion.arrayVieScalateUser
 import com.example.falesie.MainActivity.Companion.userCorrente
 import com.example.falesie.data.room.models.Falesia
 import com.example.falesie.data.room.models.Via
+import com.example.falesie.model.ViaScalata
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerState
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.ui.graphics.Color
+import java.text.SimpleDateFormat
+import java.time.DayOfWeek
+import java.time.Instant
+import java.time.LocalDate
+import java.time.Year
+import java.time.ZoneId
+import java.util.Calendar
+import java.util.Date
+import java.util.TimeZone
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,10 +107,6 @@ fun VieScreen(navController: NavHostController, falesia: Falesia) {
     }
 
     vieNellaFalesia.sortBy { it.numero }
-
-
-
-
 
     for (i in userCorrente.vieScalate) {
         arrayVieScalateUser.add(i)
@@ -147,7 +168,7 @@ fun ListaVie(
     var vieDaVisualizzare: MutableList<Via> = ArrayList()
 
     for (i in vieNellaFalesia) {
-            vieDaVisualizzare.add(i)
+        vieDaVisualizzare.add(i)
     }
 
 
@@ -162,7 +183,6 @@ fun ListaVie(
     }
 
 
-//    Log.d("SETTORI", "numero di settori ${sett.size}")
 
     if (settori.size > 1) {
         val apriMenuSettori = remember { mutableStateOf(false) }
@@ -226,8 +246,22 @@ fun ListaVie(
             .padding(top = secondPadding + columnHeightDp)
     ) {
 
+
         items(items = vieDaVisualizzare.sortedBy { it.numero }) { via ->
-            ListItem(via, navController)
+
+            var viaTemp: ViaScalata = ViaScalata()
+
+            for (i in arrayVieScalateUser) {
+                if (i.id == via.id) {
+                    viaTemp = i
+                    break
+                }
+            }
+
+//            Log.d("VIATEMP", "id viatemp ${viaTemp.id}")
+//            Log.d("VIATEMP", "numero di scalate ${viaTemp.dataRipetizioni.size}")
+
+            ListItem(via, navController, viaTemp.dataRipetizioni)
         }
 
 
@@ -237,9 +271,9 @@ fun ListaVie(
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun ListItem(via: Via, navController: NavHostController) {
+fun ListItem(via: Via, navController: NavHostController, arrayDateScalata: List<String>?) {
     //var pressioneIdVia by remember { mutableStateOf("") }
     val expanded = remember { mutableStateOf(false) }
     val extraPadding by animateDpAsState(
@@ -250,7 +284,7 @@ fun ListItem(via: Via, navController: NavHostController) {
         ), label = ""
     )
 
-    var viaPresente = false
+    val viaPresente = remember { mutableStateOf(false) }
 
     val bordoON =
         BorderStroke(width = 3.dp, color = MaterialTheme.colorScheme.inversePrimary)
@@ -262,19 +296,41 @@ fun ListItem(via: Via, navController: NavHostController) {
     val stellaON = Icons.Default.Star
     val stellaOFF = Icons.Default.StarBorder
     var stella by remember { mutableStateOf(stellaOFF) }
-    var arrayDateScalata: ArrayList<String> = ArrayList()
 
-    for (i in arrayVieScalateUser) {
-        if (i.id == via.id) {
-            arrayDateScalata = i.dataRipetizioni as ArrayList
-            Log.d("TEST", "VIA PRESENTE")
-            viaPresente = true
-            bordo = BorderStroke(width = 3.dp, color = MaterialTheme.colorScheme.primary)
-            stella = Icons.Default.Star
-        }
+    var dataLetta by remember {
+        mutableStateOf("")
+    }
+    var showDatePicker by remember {
+        mutableStateOf(false)
     }
 
 
+
+    if (!arrayDateScalata.isNullOrEmpty()) {
+        viaPresente.value = !viaPresente.value
+        bordo = BorderStroke(width = 3.dp, color = MaterialTheme.colorScheme.primary)
+        stella = Icons.Default.Star
+    }
+
+
+    if (showDatePicker) {
+        MyDatePickerDialog(
+            onDateSelected = {
+                dataLetta = it
+                if (stella == stellaOFF) {
+                    stella = stellaON
+                    bordo = bordoON
+                }
+                //TODO aggiungere la via scalata alle vie scalate dall'utente
+                
+            },
+            onDismiss = {
+                showDatePicker = false
+            }
+        )
+    }
+
+    //Log.d("DATA LETTA", dataLetta)
 
 
     Surface(
@@ -372,23 +428,6 @@ fun ListItem(via: Via, navController: NavHostController) {
 
                         }
                         Column(horizontalAlignment = Alignment.End) {
-//                            IconButton(
-//                                modifier = Modifier.combinedClickable (
-//                                    onClick = { Log.d("TEST", "CLICK PRESS") },
-//                                    onLongClick = {
-//                                        Log.d("TEST", "LONG CLICK PRESS")
-//                                        stella = Icons.Default.Star
-//                                        //onLongClickStart(via = via)
-//                                    }
-//                                        ),
-//                                onClick = { /*TODO*/ },
-//                            ) {
-//                                Icon(
-//                                    modifier = Modifier.size(48.dp),
-//                                    imageVector = stella,
-//                                    contentDescription = "stella"
-//                                )
-//                            }
 
                             Icon(
                                 modifier = Modifier
@@ -396,15 +435,19 @@ fun ListItem(via: Via, navController: NavHostController) {
                                     .combinedClickable(
                                         onClick = { Log.d("TEST", "CLICK PRESS") },
                                         onLongClick = {
+                                            showDatePicker = true
+
                                             Log.d("TEST", "LONG CLICK PRESS")
-                                            if (stella == stellaOFF) {
-                                                stella = stellaON
-                                                bordo = bordoON
-                                            } else {
-                                                stella = stellaOFF
-                                                bordo = bordoOFF
-                                            }
-                                            //onLongClickIcon(via = via)
+//                                            if (stella == stellaOFF) {
+//                                                stella = stellaON
+//                                                bordo = bordoON
+//                                            } else {
+//                                                stella = stellaOFF
+//                                                bordo = bordoOFF
+//                                            }
+                                            //TODO LONG CLICK
+                                            //Apri il pannello per scegliere la data
+
                                         }
                                     ),
                                 imageVector = stella,
@@ -415,29 +458,32 @@ fun ListItem(via: Via, navController: NavHostController) {
 
                     }
 
+                    var applicationContext = LocalContext.current
+
 
                     //TODO se l'utente ha già scalato la via aggiungi il divisore e le ripetizioni
 
-                    if (viaPresente) {
+                    if (viaPresente.value) {
                         Divider(
                             thickness = 1.dp,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.inversePrimary
                         )
                         Row(
                             modifier = Modifier.wrapContentHeight()
                         ) {
                             Text(text = "Ripetizioni: ")
                         }
-                        for (i in arrayDateScalata) {
-                            Row() {
-                                Text(
-                                    fontSize = 10.sp,
-                                    text = i
-                                )
+                        if (!arrayDateScalata.isNullOrEmpty()) {
+                            for (i in arrayDateScalata) {
+                                Row() {
+                                    Text(
+                                        fontSize = 10.sp,
+                                        text = i
+                                    )
+                                }
                             }
                         }
-
-                        viaPresente = false
+                        viaPresente.value = !viaPresente.value
                     }
 
 
@@ -462,8 +508,20 @@ fun ListItem(via: Via, navController: NavHostController) {
 }
 
 
-fun onLongClickIcon(via: Via) {
-    //Aggiungi la via alle vie scalate user
+fun caclocaArrayVie(
+    idVia: String,
+    arrayVieScalateUser: ArrayList<ViaScalata>
+): ArrayList<String> {
+    var arrayDateScalata: ArrayList<String> = ArrayList()
+
+    for (i in arrayVieScalateUser) {
+        if (i.id == idVia) {
+            for (x in i.dataRipetizioni) {
+                arrayDateScalata.add(x)
+            }
+        }
+    }
+    return arrayDateScalata
 }
 
 
@@ -493,5 +551,116 @@ fun TopAppBarFalesia(
             Text(text = titolo)
         },
     )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerView() {
+    val datePickerState = rememberDatePickerState(selectableDates = object : SelectableDates {
+        override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+            return utcTimeMillis <= System.currentTimeMillis()
+        }
+    })
+    val selectedDate = datePickerState.selectedDateMillis?.let {
+        convertMillisToDate(it)
+    }
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        DatePicker(
+            state = datePickerState
+        )
+        Spacer(
+            modifier = Modifier.height(
+                32.dp
+            )
+        )
+        Button(
+            onClick = {
+                /*TODO*/
+            }) {
+            Text(
+                text = selectedDate.toString(),
+                color = Color.Red
+            )
+        }
+
+    }
+}
+
+private fun convertMillisToDate(millis: Long): String {
+    val formatter = SimpleDateFormat("dd/MM/yyyy")
+    return formatter.format(Date(millis))
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyDatePickerDialog(
+    onDateSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState(selectableDates = object : SelectableDates {
+        override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+            return utcTimeMillis <= System.currentTimeMillis()
+        }
+    })
+
+    val selectedDate = datePickerState.selectedDateMillis?.let {
+        convertMillisToDate(it)
+    } ?: ""
+
+    DatePickerDialog(
+        onDismissRequest = { onDismiss() },
+        confirmButton = {
+            Button(onClick = {
+                onDateSelected(selectedDate)
+                onDismiss()
+            }
+
+            ) {
+                Text(text = "OK")
+            }
+        },
+        dismissButton = {
+            Button(onClick = {
+                onDismiss()
+            }) {
+                Text(text = "Cancel")
+            }
+        }
+    ) {
+        DatePicker(
+            state = datePickerState
+        )
+    }
+}
+
+
+@Composable
+fun MyDatePickerDialog(): String {
+    var date by remember {
+        mutableStateOf("Open date picker dialog")
+    }
+
+    var showDatePicker by remember {
+        mutableStateOf(true)
+    }
+
+//    Box(contentAlignment = Alignment.Center) {
+//        Button(onClick = { showDatePicker = true }) {
+//            Text(text = date)
+//        }
+//    }
+
+    if (showDatePicker) {
+        MyDatePickerDialog(
+            onDateSelected = { date = it },
+            onDismiss = {
+                showDatePicker = false
+                date = ""
+            }
+        )
+    }
+    return date
 }
 
