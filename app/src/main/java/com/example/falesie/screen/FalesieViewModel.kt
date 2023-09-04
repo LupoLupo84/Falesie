@@ -28,9 +28,14 @@ class FalesieViewModel
 constructor(
     private val repository: Repository = Graph.repository
 ): ViewModel() {
+
+
+
+
     //var state by mutableStateOf(DettagliVia())
     var state by mutableStateOf(VieState())
         private set
+
 
     var stateFalesie by mutableStateOf(FalesieState())
         private set
@@ -51,8 +56,6 @@ constructor(
     private val _listaLetta = mutableStateListOf(Graph.repository.storeVie)
 
     var listaLetta = _listaLetta
-
-
 
 
     fun onItemChange(newValue: String) {

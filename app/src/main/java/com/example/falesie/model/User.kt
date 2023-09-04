@@ -20,6 +20,7 @@ data class User(
     //val vieScalate: List<ViaScalata> = emptyList(),
     val admin: Boolean = false,
     val test: Timestamp = Timestamp(0,0),
+    val aggiora: Boolean = true,
     //val vieScalate: Array<String> = emptyArray()
 
 ) : Parcelable {
@@ -33,7 +34,8 @@ data class User(
         parcel.readString()!!,
         parcel.createStringArray()!! as List<ViaScalata>,
         parcel.readBoolean(),
-        parcel.readParcelable(Timestamp::class.java.classLoader)!!
+        parcel.readParcelable(Timestamp::class.java.classLoader)!!,
+        parcel.readBoolean(),
         //parcel.createStringArray() as Array<String>
     )
 
@@ -48,6 +50,7 @@ data class User(
         parcel.writeList(vieScalate)
         parcel.writeBoolean(admin)
         parcel.writeParcelable(test, flags)
+        parcel.writeBoolean(aggiora)
         //parcel.writeArray(vieScalate)
     }
 

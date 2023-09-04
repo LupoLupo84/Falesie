@@ -52,6 +52,12 @@ interface ViaDao{
     @Query("SELECT * FROM vie WHERE via_id =:via_id")
     fun getVia(via_id:Int):Flow<Via>
 
+    @Query("SELECT * FROM vie WHERE falesiaIdFk =:falesia ORDER BY numero")
+    fun getVieFalesia(falesia:String):Flow<List<Via>>
+
+    @Query("SELECT * FROM vie WHERE falesiaIdFk =:falesia AND settore =:settore ORDER BY numero")
+    fun getVieFalesiaSettore(falesia:String,settore:String):Flow<List<Via>>
+
 }
 
 

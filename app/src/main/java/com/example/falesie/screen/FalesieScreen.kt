@@ -124,8 +124,12 @@ fun ListaFalesie(
     navController: NavHostController,
 ) {
 
-    //salvaDbVieInLocale()
-    //salvaDbFalesieInLocale()
+    Log.d("Caricamento", userCorrente.aggiora.toString())
+    if (userCorrente.aggiora) {
+        salvaDbVieInLocale()
+        salvaDbFalesieInLocale()
+        Log.d("Caricamento", "caricamento vie da db online")
+    }
 
 
     val viewModelVia = viewModel<FalesieViewModel>(factory = FalesieViewModelFactory())
@@ -248,7 +252,7 @@ fun salvaFalesieInLocale() {
 
 
 @Composable
-fun ListItem(falesia: com.example.falesie.data.room.models.Falesia, navController: NavHostController) {
+fun ListItem(falesia: Falesia, navController: NavHostController) {
     var pressioneIdFalesia by remember { mutableStateOf("") }
     val expanded = remember { mutableStateOf(false) }
     val extraPadding by animateDpAsState(
@@ -310,7 +314,8 @@ fun ListItem(falesia: com.example.falesie.data.room.models.Falesia, navControlle
                 ) {
                     //if (falesia.altitudine > 0) Text(text = "Altitudine " + falesia.altitudine + "m")
                     Column(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .wrapContentHeight()
                     ) {
 

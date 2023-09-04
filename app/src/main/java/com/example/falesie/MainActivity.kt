@@ -97,7 +97,8 @@ class MainActivity : ComponentActivity() {
 //        var listaVieSelezionate: ArrayList<Via> = ArrayList()               // Vie presenti nella falesia corrente
 //        var falesiaSelezionata:Falesia = Falesia()                          // Falesia selezionata per la modifica
 //        var viaSelezionata : Via = Via()
-        var arrayVieScalateUser: ArrayList<ViaScalata> = ArrayList()
+        //var arrayVieScalateUser: ArrayList<ViaScalata> = ArrayList()
+var arrayVieScalateUser: MutableList<ViaScalata> = arrayListOf()
     }
 
 

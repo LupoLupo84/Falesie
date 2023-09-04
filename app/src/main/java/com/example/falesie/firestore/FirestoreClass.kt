@@ -2,9 +2,13 @@ package com.example.falesie.firestore
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import com.example.falesie.Aggiorna
 import com.example.falesie.Constants
@@ -120,7 +124,31 @@ class FirestoreClass {
     }
 
 
-    //fun firstLoadUserData(aggiorna: Aggiorna) {
+
+    fun updateUserProfileData(userHashMap: HashMap<String, Any>) {
+
+
+        mFireStore.collection(Constants.USERS) // Collection Name
+            .document(getCurrentUserID()) // Document ID
+            .update(userHashMap) // A hashmap of fields which are to be updated.
+            .addOnSuccessListener {
+                // Profile data is updated successfully.
+                Log.d("FIRESTORE", "Profile Data updated successfully!")
+
+            }
+            .addOnFailureListener { e ->
+                //activity.hideProgressDialog()
+                Log.e(
+                    "FIRESTORE",
+                    "Error while creating a user profile.",
+                    e
+                )
+            }
+    }
+
+
+
+
     fun firstLoadUserData(): User {
 
         lateinit var userRitorno: User
@@ -213,7 +241,6 @@ class FirestoreClass {
     }
 
 
-    //fun leggiVieScalateUser(userId: String, aggiorna: Aggiorna) {
     fun leggiVieScalateUser(userId: String) {
         mFireStore.collection(Constants.USERS)
             .document(userId)

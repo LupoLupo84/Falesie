@@ -1,5 +1,6 @@
 package com.example.falesie.ui.repository
 
+import android.util.Log
 import com.example.falesie.data.room.FalesiaDao
 import com.example.falesie.data.room.ItemDao
 import com.example.falesie.data.room.ListDao
@@ -10,6 +11,10 @@ import com.example.falesie.data.room.models.Item
 import com.example.falesie.data.room.models.ShoppingList
 import com.example.falesie.data.room.models.Store
 import com.example.falesie.data.room.models.Via
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.transform
 
 class Repository(
     private val listDao: ListDao,
@@ -49,6 +54,20 @@ class Repository(
 
 
     val storeVie = viaDao.getAllVie()
+
+    //val storeVieFalesia = viaDao.getVieFalesia()
+
+
+    fun getVieFalesia(falesia:String): Flow<List<Via>>{
+        val storeVieFalesia = viaDao.getVieFalesia(falesia)
+        return storeVieFalesia
+    }
+
+    fun getVieFalesiaSettore(falesia:String, settore:String): Flow<List<Via>>{
+        val storeVieFalesia = viaDao.getVieFalesiaSettore(falesia,settore)
+        return storeVieFalesia
+    }
+
     suspend fun insertVia(via: Via){
         viaDao.insert(via)
     }
