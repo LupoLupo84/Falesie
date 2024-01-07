@@ -1,12 +1,10 @@
-package com.example.falesie.model
+package com.example.falesie.data.firestore.model
 
 import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.RequiresApi
 import com.google.firebase.Timestamp
-import java.util.*
-
 
 
 data class User(
@@ -20,7 +18,7 @@ data class User(
     //val vieScalate: List<ViaScalata> = emptyList(),
     val admin: Boolean = false,
     val test: Timestamp = Timestamp(0,0),
-    val aggiora: Boolean = true,
+    var aggiorna: Boolean = true,
     //val vieScalate: Array<String> = emptyArray()
 
 ) : Parcelable {
@@ -50,7 +48,7 @@ data class User(
         parcel.writeList(vieScalate)
         parcel.writeBoolean(admin)
         parcel.writeParcelable(test, flags)
-        parcel.writeBoolean(aggiora)
+        parcel.writeBoolean(aggiorna)
         //parcel.writeArray(vieScalate)
     }
 

@@ -5,86 +5,44 @@ package com.example.falesie
 
 import android.os.Bundle
 import android.util.Log
-import android.view.Surface
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.room.Room
-import com.example.falesie.firestore.FirestoreClass
-import com.example.falesie.model.Falesia
-import com.example.falesie.model.User
-import com.example.falesie.model.Via
-import com.example.falesie.model.ViaScalata
-import com.example.falesie.room.ContactDatabase
-import com.example.falesie.room.ContactViewModel
-import com.example.falesie.room.Contactscreen
-import com.example.falesie.room.ViarDatabase
-import com.example.falesie.room.ViarViewModel
-import com.example.falesie.screen.DbRoomScreen
+import androidx.navigation.navArgument
+import com.example.falesie.data.firestore.FirestoreClass
+import com.example.falesie.data.firestore.model.Falesia
+import com.example.falesie.data.firestore.model.User
+import com.example.falesie.data.firestore.model.Via
+import com.example.falesie.data.firestore.model.ViaScalata
 import com.example.falesie.screen.LoginScreen
 import com.example.falesie.screen.FalesieScreen
 import com.example.falesie.screen.GestioneFalesieScreen
 import com.example.falesie.screen.ProfiloScreen
 import com.example.falesie.screen.RegisterScreen
 import com.example.falesie.screen.VieScreen
-import com.example.falesie.screen.falesiaSelected
+//import com.example.falesie.screen.VieScreen
 import com.example.falesie.ui.JetShopingNavigation
-import com.example.falesie.ui.home.HomeScreen
 import com.example.falesie.ui.theme.FalesieTheme
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var factory : FalesieViewModelFactory
 
-    private val db by lazy {
-        Room.databaseBuilder(
-            applicationContext,
-            ContactDatabase::class.java,
-            "contacts.db"
-        ).build()
-    }
-    private val viewModel by viewModels<ContactViewModel>(
-        factoryProducer = {
-            object : ViewModelProvider.Factory{
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return ContactViewModel(db.dao) as T
-                }
-            }
-        }
-    )
-
-    private val dbViar by lazy {
-        Room.databaseBuilder(
-            applicationContext,
-            ViarDatabase::class.java,
-            "via.db"
-        ).build()
-    }
-    private val viewModelViar by viewModels<ViarViewModel>(
-        factoryProducer = {
-            object : ViewModelProvider.Factory{
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return ViarViewModel(dbViar.dao) as T
-                }
-            }
-        }
-    )
 
     companion object {
         val auth by lazy { Firebase.auth }
@@ -92,8 +50,8 @@ class MainActivity : ComponentActivity() {
         //var userCorrente = User()
         //var userCorrente: User = User()
         //var userCorrente = FirestoreClass().firstLoadUserData()
-        var listaVie: ArrayList<Via> = ArrayList()                          // Tutte le vie presenti nel db
-        var listaFalesie: ArrayList<Falesia> = ArrayList()                  // Tutte le falesie presenti nel db
+        var listaVie: ArrayList<Via> = ArrayList()                          // Firestore  Tutte le vie presenti nel db
+        var listaFalesie: ArrayList<Falesia> = ArrayList()                  // Firestore  Tutte le falesie presenti nel db
 //        var listaVieSelezionate: ArrayList<Via> = ArrayList()               // Vie presenti nella falesia corrente
 //        var falesiaSelezionata:Falesia = Falesia()                          // Falesia selezionata per la modifica
 //        var viaSelezionata : Via = Via()
@@ -150,7 +108,8 @@ var arrayVieScalateUser: MutableList<ViaScalata> = arrayListOf()
                         LoginScreen(navController)
                     }
                     composable("FalesieScreen") {
-                        FalesieScreen(navController, onEvent = viewModelViar::onEvent)
+                        Constants.SETTORECORRENTE = "Tutti i settori"
+                        FalesieScreen(navController, factory)
                     }
                     composable("RegisterScreen") {
                         RegisterScreen(navController)
@@ -161,15 +120,23 @@ var arrayVieScalateUser: MutableList<ViaScalata> = arrayListOf()
                     composable("GestioneFalesieScreen") {
                         GestioneFalesieScreen(navController)
                     }
-                    composable("VieScreen") {
-                        VieScreen(navController, falesiaSelected)
+                    // esempio navArgument https://www.reddit.com/r/JetpackCompose/comments/15gieu3/how_to_pass_arguments_to_a_composable_using/
+                    composable(
+                        route = "${"VieScreen"}/{nomeFalesia}",
+                        arguments = listOf(
+                            navArgument("nomeFalesia") { type = NavType.StringType }
+                        )
+                    ){backStackEntry ->
+                        val arguments = requireNotNull(backStackEntry.arguments)
+                        val nomeFalesia =
+                            arguments.getString("nomeFalesia") ?: error("")
+                        val falesieViewModel : FalesieViewModel = viewModel(factory = factory)
+                        val vieNelSettore = falesieViewModel.vieNellaFalesiaSettore.collectAsState(initial = emptyList())
+                        val vieNellaFalesia = falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
+                        //VieScreen(navController, nomeFalesia, factory, falesieViewModel, vieNelSettore)
+                        VieScreen(navController, nomeFalesia, factory, falesieViewModel, vieNellaFalesia)
+                        //VieScreen(navController, nomeFalesia, factory, falesieViewModel)
                     }
-                    composable("DbRoomScreen") {
-                        DbRoomScreen(navController, onEvent = viewModelViar::onEvent)
-
-                        //test database room
-//                        val state by viewModel.state.collectAsState()
-//                        Contactscreen(state = state , onEvent = viewModel::onEvent)
 
                     }
 
@@ -189,9 +156,10 @@ var arrayVieScalateUser: MutableList<ViaScalata> = arrayListOf()
 
 
 
+
     @Composable
     fun JetShoppingApp(){
         JetShopingNavigation()
     }
 
-}
+

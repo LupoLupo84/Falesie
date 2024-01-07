@@ -25,7 +25,7 @@ fun GestioneFalesieScreen(navController: NavHostController){
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheetMenu(navController = navController, null)
+            ModalDrawerSheetMenu(navController = navController)
         }
     ) {
 

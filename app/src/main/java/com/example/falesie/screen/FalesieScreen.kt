@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
@@ -33,10 +32,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,53 +49,50 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.falesie.Aggiorna
-import com.example.falesie.Graph.repository
-import com.example.falesie.MainActivity.Companion.listaFalesie
-import com.example.falesie.MainActivity.Companion.listaVie
+import com.example.falesie.Constants
+import com.example.falesie.FalesieViewModel
+import com.example.falesie.FalesieViewModelFactory
 import com.example.falesie.MainActivity.Companion.userCorrente
+import com.example.falesie.data.firestore.FirestoreClass
+import com.example.falesie.data.firestore.salvaDbFalesieInLocale
+import com.example.falesie.data.firestore.salvaDbVieInLocale
 import com.example.falesie.data.room.models.Falesia
 import com.example.falesie.data.room.models.Via
-import com.example.falesie.firestore.FirestoreClass
-import com.example.falesie.room.ViarEvent
-import kotlinx.coroutines.runBlocking
-
-
-var falesiaSelected = Falesia(
-    "",
-    "",
-    "",
-    "",
-    "",
-    0,
-    0,
-    false,
-    false,
-    false,
-    false,
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FalesieScreen(
     navController: NavHostController,
-    onEvent: (ViarEvent) -> Unit
+    factory: FalesieViewModelFactory,
+    falesieViewModel : FalesieViewModel = viewModel(factory = factory),
+    //onEvent: (ViarEvent) -> Unit
 ) {
 
+    if (userCorrente.aggiorna) {
+    salvaDbVieInLocale(factory)
+    salvaDbFalesieInLocale(factory)
+        Log.d("Caricamento", "caricamento vie da db online")
+//TODO imposta a zero il valore aggiorna dell'userCorrente
+        val temp:HashMap<String, Any> = hashMapOf("aggiorna" to false)
+        FirestoreClass().updateUserProfileData(
+            temp
+        )
+    }
 
-    //val viewModel = viewModel<FalesieViewModel>(factory = FalesieViewModelFactory())
-    //Log.d("TEST size storelistvie", viewModel.state.storeListVie.size.toString())
-
+    val listaVie = falesieViewModel.vieList.collectAsState(initial = emptyList())
+    val listaFalesie = falesieViewModel.falesieList.collectAsState(initial = emptyList())
     val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    Log.d("TEST", userCorrente.email)
+    Log.d("TEST admin", userCorrente.admin.toString())
+    Log.d("TEST aggiorna", userCorrente.aggiorna.toString())
+    Log.d("TEST email", userCorrente.email)
 
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheetMenu(navController = navController, onEvent)
+            ModalDrawerSheetMenu(navController = navController)
         }
     ) {
         Scaffold(
@@ -107,7 +106,14 @@ fun FalesieScreen(
                 )
             },
             content = {
-                ListaFalesie(paddingValues = it, navController)
+                ListaFalesie(paddingValues = it, navController, listaVie, listaFalesie,{
+                    //chiamata di ritorno in onSelectFalesia
+                    Constants.FALESIACORRENTEID = it.id
+                    Log.d("Ritorno della chiamata", it.nome)
+                    val route = "${"VieScreen"}/${it.nome}"
+                    navController.navigate(route)
+                    // esempio navArgument https://www.reddit.com/r/JetpackCompose/comments/15gieu3/how_to_pass_arguments_to_a_composable_using/
+                })
             }
         )
 
@@ -122,128 +128,27 @@ fun FalesieScreen(
 fun ListaFalesie(
     paddingValues: PaddingValues,
     navController: NavHostController,
+    listaVie : State<List<Via>>,
+    listaFalesie : State<List<Falesia>>,
+    onSelectFalesia : (Falesia) -> Unit,
 ) {
-
-    Log.d("Caricamento", userCorrente.aggiora.toString())
-    if (userCorrente.aggiora) {
-        salvaDbVieInLocale()
-        salvaDbFalesieInLocale()
-        Log.d("Caricamento", "caricamento vie da db online")
-    }
-
-
-    val viewModelVia = viewModel<FalesieViewModel>(factory = FalesieViewModelFactory())
-    val vieState = viewModelVia.state
-    val falesieState = viewModelVia.stateFalesie
-
-    var listaTempFalesie: MutableList<Falesia> = ArrayList()
-
-    for (i in falesieState.items){
-        listaTempFalesie.add(i)
-    }
-
-    listaTempFalesie.sortBy { it.nome }
-
-
-
-
     Scaffold()
     {
         LazyColumn(
             modifier = Modifier
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
-
-            items(listaTempFalesie) { falesia ->
-                ListItem(falesia, navController)
+            items(
+                items = listaFalesie.value,
+                key = {item -> item.id}
+            ){ item ->
+                ListItem(falesia = item, { onSelectFalesia(it) })
             }
-
-
-
-
         }
-
-
-    }
-
-
-}
-
-
-@Composable
-fun salvaDbVieInLocale() {
-    //USATA PER SALVARE IL DATABASE DI RETE NEL DATABASE LOCALE
-    var caricamentoCompletato by remember { mutableStateOf(false) }
-    FirestoreClass().leggiTutteLeVie(object : Aggiorna {
-        override fun aggiorna() {
-            Log.i("VIE LETTE ELSE", listaVie.size.toString())
-            caricamentoCompletato = true
-        }
-    })
-    if (caricamentoCompletato == true) {
-        //compilaListaFalesie(paddingValues)
-        //RecyclerView(paddingValues, navController)
-        //SALVA LE VIE NEL DATABASE LOCALE ROOM
-        salvaVieInLocale()
-    }
-}
-
-@Composable
-fun salvaDbFalesieInLocale() {
-    //USATA PER SALVARE IL DATABASE DI RETE NEL DATABASE LOCALE
-    var caricamentoCompletato by remember { mutableStateOf(false) }
-    FirestoreClass().leggiTutteLeFalesie(object : Aggiorna {
-        override fun aggiorna() {
-            Log.i("FALESIE LETTE ELSE", listaFalesie.size.toString())
-            caricamentoCompletato = true
-        }
-    })
-    if (caricamentoCompletato == true) {
-
-        //SALVA LE VIE NEL DATABASE LOCALE ROOM
-        salvaFalesieInLocale()
     }
 }
 
 
-fun salvaVieInLocale() {
-    for (i in listaVie) {
-        var viaRoom = Via(
-            id = i.id,
-            viaName = i.nome,
-            settore = i.settore,
-            numero = i.numero,
-            falesiaIdFk = i.falesia,
-            grado = i.grado,
-            protezioni = i.protezioni,
-            altezza = i.altezza,
-            immagine = i.immagine,
-            isChecked = false
-        )
-        //repository.insertVia(viaRoom)
-        runBlocking { repository.insertVia(viaRoom) }
-    }
-}
-
-fun salvaFalesieInLocale() {
-    for (i in listaFalesie) {
-        var falesiaRoom = com.example.falesie.data.room.models.Falesia(
-            id = i.id,
-            nome = i.nome,
-            descrizione = i.descrizione,
-            latitudine = i.latitudine,
-            longitudine = i.longitudine,
-            stagioni = i.stagioni,
-            altitudine = i.altitudine,
-            primavera = i.primavera,
-            estate = i.estate,
-            autunno = i.autunno,
-            inverno = i.inverno
-        )
-        //repository.insertVia(viaRoom)
-        runBlocking { repository.insertFalesia(falesiaRoom) }
-    }
-}
 
 
 
@@ -252,9 +157,11 @@ fun salvaFalesieInLocale() {
 
 
 @Composable
-fun ListItem(falesia: Falesia, navController: NavHostController) {
+fun ListItem(
+    falesia: Falesia,
+    onSelectFalesia: (Falesia) -> Unit) {
     var pressioneIdFalesia by remember { mutableStateOf("") }
-    val expanded = remember { mutableStateOf(false) }
+    val expanded = rememberSaveable { mutableStateOf(false) }
     val extraPadding by animateDpAsState(
         if (expanded.value) 24.dp else 0.dp,
         animationSpec = spring(
@@ -285,7 +192,8 @@ fun ListItem(falesia: Falesia, navController: NavHostController) {
                             .clickable {
                                 pressioneIdFalesia = falesia.id
                                 //falesiaSelezionata = falesia
-                                falesiaSelected = falesia
+                                //falesiaSelected = falesia
+                                onSelectFalesia(falesia)
                                 Log.d("FALESIA SELEZIONATA", falesia.id)
                             },
                         text = falesia.nome,
@@ -378,19 +286,19 @@ fun ListItem(falesia: Falesia, navController: NavHostController) {
         }
     }
 
-    if (pressioneIdFalesia.isNotEmpty()) {       //falesiaSelezionata id falesia
-
-
-//        when (pressioneIdFalesia) {
+//    if (pressioneIdFalesia.isNotEmpty()) {       //falesiaSelezionata id falesia
 //
-//            falesiaSelezionata.id -> {
-//                //Log.d("SELEZIONE", selectedItems)
-                pressioneIdFalesia = ""
-//                //navController.popBackStack()
-                navController.navigate("VieScreen")
-//            }
-//        }
-    }
+//
+////        when (pressioneIdFalesia) {
+////
+////            falesiaSelezionata.id -> {
+////                //Log.d("SELEZIONE", selectedItems)
+//                pressioneIdFalesia = ""
+////                //navController.popBackStack()
+//                navController.navigate("VieScreen")
+////            }
+////        }
+//    }
 
 
 }

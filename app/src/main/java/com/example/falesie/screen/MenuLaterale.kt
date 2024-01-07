@@ -30,7 +30,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,9 +46,8 @@ import com.example.falesie.MainActivity
 import com.example.falesie.MainActivity.Companion.userCorrente
 import com.example.falesie.MenuItem
 import com.example.falesie.R
-import com.example.falesie.firestore.FirestoreClass
-import com.example.falesie.model.User
-import com.example.falesie.room.ViarEvent
+import com.example.falesie.data.firestore.FirestoreClass
+import com.example.falesie.data.firestore.model.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -59,11 +57,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun ModalDrawerSheetMenu(
     navController: NavHostController,
-    onEvent: ((ViarEvent) -> Unit)?
+    //onEvent: ((ViarEvent) -> Unit)?
 ) {
 
     var user = remember { mutableStateOf(userCorrente) }
-    Log.d("USER", user.value.email)
+    Log.d("ModalDrawerSheetMenu USER", user.value.email)
 
     val listaDeiMenu = listOf(
         MenuItem(id = "Profilo", title = "Profilo", "Profilo", Icons.Filled.Person, false),

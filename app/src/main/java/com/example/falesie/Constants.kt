@@ -19,6 +19,9 @@ object Constants {
     const val VIA: String = "vie"
     const val FALESIA: String = "falesie"
 
+    var FALESIACORRENTEID :String = ""
+    var SETTORECORRENTE : String = "Tutti i settori"
+
     // Firebase database field names
     const val IMAGE: String = "immagine"
     const val NAME: String = "nome"

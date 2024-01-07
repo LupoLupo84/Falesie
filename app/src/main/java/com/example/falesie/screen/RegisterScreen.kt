@@ -60,9 +60,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.falesie.MainActivity.Companion.auth
 import com.example.falesie.R
-import com.example.falesie.firestore.FirestoreClass
-import com.example.falesie.model.User
-import com.example.falesie.model.ViaScalata
+import com.example.falesie.data.firestore.FirestoreClass
+import com.example.falesie.data.firestore.model.User
+import com.example.falesie.data.firestore.model.ViaScalata
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -77,7 +77,7 @@ fun RegisterScreen(navController: NavHostController) {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheetMenu(navController = navController, null)
+            ModalDrawerSheetMenu(navController = navController)
         }
     ) {
 
@@ -316,10 +316,25 @@ fun RegisterFrame(
                                         registeredEmail,
                                         "",
                                         0,
-                                        "", list,
+                                        "",
+                                        list,
                                         false,
-                                        Timestamp(0, 0)
+                                        Timestamp(0, 0),
+                                        false
                                     )
+//                                    val user = User(
+//                                        id = firebaseUser.uid,
+//                                        nome = nome,
+//                                        email = registeredEmail,
+//                                        immagine = "",
+//                                        telefono = 0,
+//                                        gradoMax = "0",
+//                                        vieScalate = list,
+//                                        admin = false,
+//                                        test = Timestamp(0,0)
+//                                        aggiorna = false,
+//
+//                                    )
                                     FirestoreClass().registerUser(context, user, navController)
 
                                 } else {

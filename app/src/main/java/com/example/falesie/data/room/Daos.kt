@@ -2,37 +2,14 @@ package com.example.falesie.data.room
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Embedded
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.falesie.data.room.models.Falesia
-import com.example.falesie.data.room.models.Item
-import com.example.falesie.data.room.models.ShoppingList
-import com.example.falesie.data.room.models.Store
 import com.example.falesie.data.room.models.Via
 import kotlinx.coroutines.flow.Flow
 
-@Dao
-interface ItemDao{
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(item:Item)
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(item: Item)
-
-    @Delete
-    suspend fun delete(item: Item)
-
-    @Query("SELECT * FROM items")
-    fun getAllItems():Flow<List<Item>>
-
-    @Query("SELECT * FROM items WHERE item_id =:itemId")
-    fun getItem(itemId:Int):Flow<Item>
-
-}
 
 @Dao
 interface ViaDao{
@@ -55,8 +32,10 @@ interface ViaDao{
     @Query("SELECT * FROM vie WHERE falesiaIdFk =:falesia ORDER BY numero")
     fun getVieFalesia(falesia:String):Flow<List<Via>>
 
+
     @Query("SELECT * FROM vie WHERE falesiaIdFk =:falesia AND settore =:settore ORDER BY numero")
     fun getVieFalesiaSettore(falesia:String,settore:String):Flow<List<Via>>
+
 
 }
 
@@ -80,65 +59,3 @@ interface FalesiaDao{
     fun getFalesia(falesia_id:Int):Flow<Falesia>
 
 }
-
-@Dao
-interface StoreDao{
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(store: Store)
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(store: Store)
-
-    @Delete
-    suspend fun delete(store: Store)
-
-    @Query("SELECT * FROM stores")
-    fun getAllStores():Flow<List<Store>>
-
-    @Query("SELECT * FROM stores WHERE store_id =:storeId")
-    fun getStore(storeId:Int):Flow<Store>
-
-}
-
-
-@Dao
-interface ListDao{
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertShoppingList(shoppingList: ShoppingList)
-
-    @Query(
-        """
-        SELECT * FROM items AS I INNER JOIN shopping_list AS S
-        ON I.listId = S.list_id INNER JOIN stores AS ST
-        ON I.storeIdFk = ST.store_id
-    """
-    )
-    fun getItemsWithStoreAndList():Flow<List<ItemsWithStoreAndList>>
-
-    @Query(
-        """
-        SELECT * FROM items AS I INNER JOIN shopping_list AS S
-        ON I.listId = S.list_id INNER JOIN stores AS ST
-        ON I.storeIdFk = ST.store_id WHERE S.list_id = :listId
-    """
-    )
-    fun getItemsWithStoreAndListFilteredById(listId:Int)
-    :Flow<List<ItemsWithStoreAndList>>
-
-    @Query(
-        """
-        SELECT * FROM items AS I INNER JOIN shopping_list AS S
-        ON I.listId = S.list_id INNER JOIN stores AS ST
-        ON I.storeIdFk = ST.store_id WHERE I.item_id = :itemId
-    """
-    )
-    fun getItemWithStoreAndListFilteredById(itemId :Int)
-    :Flow<ItemsWithStoreAndList>
-}
-
-data class ItemsWithStoreAndList(
-    @Embedded val item: Item,
-    @Embedded val shoppingList: ShoppingList,
-    @Embedded val store: Store
-)

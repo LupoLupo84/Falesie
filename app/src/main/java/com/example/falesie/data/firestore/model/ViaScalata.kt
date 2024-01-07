@@ -1,4 +1,4 @@
-package com.example.falesie.model
+package com.example.falesie.data.firestore.model
 
 import android.os.Parcel
 import android.os.Parcelable

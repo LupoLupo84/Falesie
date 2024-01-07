@@ -1,7 +1,7 @@
-package com.example.falesie.firestore
+package com.example.falesie.data.firestore
 
 import android.util.Log
-import com.example.falesie.model.Via
+import com.example.falesie.data.firestore.model.Via
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 
