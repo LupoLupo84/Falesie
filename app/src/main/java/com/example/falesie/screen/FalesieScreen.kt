@@ -65,7 +65,6 @@ fun FalesieScreen(
     navController: NavHostController,
     factory: FalesieViewModelFactory,
     falesieViewModel : FalesieViewModel = viewModel(factory = factory),
-    //onEvent: (ViarEvent) -> Unit
 ) {
 
     if (userCorrente.aggiorna) {
@@ -87,6 +86,7 @@ fun FalesieScreen(
     Log.d("TEST admin", userCorrente.admin.toString())
     Log.d("TEST aggiorna", userCorrente.aggiorna.toString())
     Log.d("TEST email", userCorrente.email)
+
 
 
     ModalNavigationDrawer(
@@ -132,6 +132,7 @@ fun ListaFalesie(
     listaFalesie : State<List<Falesia>>,
     onSelectFalesia : (Falesia) -> Unit,
 ) {
+    var listSorted = listaFalesie.value.sortedBy { it.nome }
     Scaffold()
     {
         LazyColumn(
@@ -139,7 +140,8 @@ fun ListaFalesie(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             items(
-                items = listaFalesie.value,
+                //items = listaFalesie.value,
+                items = listSorted,
                 key = {item -> item.id}
             ){ item ->
                 ListItem(falesia = item, { onSelectFalesia(it) })
@@ -191,8 +193,6 @@ fun ListItem(
                         modifier = Modifier
                             .clickable {
                                 pressioneIdFalesia = falesia.id
-                                //falesiaSelezionata = falesia
-                                //falesiaSelected = falesia
                                 onSelectFalesia(falesia)
                                 Log.d("FALESIA SELEZIONATA", falesia.id)
                             },
@@ -206,8 +206,6 @@ fun ListItem(
 
                 OutlinedButton(onClick = { expanded.value = !expanded.value }) {
                     Text(if (expanded.value) "Comprimi ▲" else "Espandi ▼", color = MaterialTheme.colorScheme.inversePrimary)
-
-                    //if (expanded.value) "${via.grado} ▲" else "${via.grado} ▼",
                 }
 
             }
@@ -220,7 +218,6 @@ fun ListItem(
                             bottom = extraPadding.coerceAtLeast(0.dp)
                         )
                 ) {
-                    //if (falesia.altitudine > 0) Text(text = "Altitudine " + falesia.altitudine + "m")
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -285,20 +282,6 @@ fun ListItem(
 
         }
     }
-
-//    if (pressioneIdFalesia.isNotEmpty()) {       //falesiaSelezionata id falesia
-//
-//
-////        when (pressioneIdFalesia) {
-////
-////            falesiaSelezionata.id -> {
-////                //Log.d("SELEZIONE", selectedItems)
-//                pressioneIdFalesia = ""
-////                //navController.popBackStack()
-//                navController.navigate("VieScreen")
-////            }
-////        }
-//    }
 
 
 }

@@ -27,6 +27,7 @@ import com.example.falesie.data.firestore.model.ViaScalata
 import com.example.falesie.screen.LoginScreen
 import com.example.falesie.screen.FalesieScreen
 import com.example.falesie.screen.GestioneFalesieScreen
+import com.example.falesie.screen.ModificaVieScreen
 import com.example.falesie.screen.ProfiloScreen
 import com.example.falesie.screen.RegisterScreen
 import com.example.falesie.screen.VieScreen
@@ -118,7 +119,7 @@ var arrayVieScalateUser: MutableList<ViaScalata> = arrayListOf()
                         ProfiloScreen(navController)
                     }
                     composable("GestioneFalesieScreen") {
-                        GestioneFalesieScreen(navController)
+                        GestioneFalesieScreen(navController, factory)
                     }
                     // esempio navArgument https://www.reddit.com/r/JetpackCompose/comments/15gieu3/how_to_pass_arguments_to_a_composable_using/
                     composable(
@@ -135,6 +136,24 @@ var arrayVieScalateUser: MutableList<ViaScalata> = arrayListOf()
                         val vieNellaFalesia = falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
                         //VieScreen(navController, nomeFalesia, factory, falesieViewModel, vieNelSettore)
                         VieScreen(navController, nomeFalesia, factory, falesieViewModel, vieNellaFalesia)
+                        //VieScreen(navController, nomeFalesia, factory, falesieViewModel)
+                    }
+
+                    //MODIFICA VIE
+                    composable(
+                        route = "${"ModificaVieScreen"}/{nomeFalesia}",
+                        arguments = listOf(
+                            navArgument("nomeFalesia") { type = NavType.StringType }
+                        )
+                    ){backStackEntry ->
+                        val arguments = requireNotNull(backStackEntry.arguments)
+                        val nomeFalesia =
+                            arguments.getString("nomeFalesia") ?: error("")
+                        val falesieViewModel : FalesieViewModel = viewModel(factory = factory)
+                        //val vieNelSettore = falesieViewModel.vieNellaFalesiaSettore.collectAsState(initial = emptyList())
+                        val vieNellaFalesia = falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
+                        //VieScreen(navController, nomeFalesia, factory, falesieViewModel, vieNelSettore)
+                        ModificaVieScreen(navController, nomeFalesia, factory, falesieViewModel, vieNellaFalesia)
                         //VieScreen(navController, nomeFalesia, factory, falesieViewModel)
                     }
 

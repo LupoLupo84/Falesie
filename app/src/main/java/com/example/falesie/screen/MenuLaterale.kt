@@ -101,10 +101,8 @@ fun ModalDrawerSheetMenu(
                         )
                     },
                     label = { Text(text = menuItem.title) },
-                    //selected = selectedItems == index,
                     selected = selectedItems == menuItem.contentDescription,
                     onClick = {
-                        //selectedItems = index
                         selectedItems = menuItem.contentDescription
                     })
             }
@@ -225,11 +223,9 @@ fun DrawProfileUser() {
                         .data(immagine)
                         .apply(block = fun ImageRequest.Builder.() {
                             crossfade(false)
-                            //placeholder(R.drawable.placeholderfoto_face_24)
                         }).build()
                 ),
                 contentDescription = "description",
-                //contentScale = ContentScale.FillHeight
                 contentScale = ContentScale.Fit
             )
 
@@ -267,10 +263,6 @@ fun DrawProfileUser() {
             )
 
         }
-
-        //Spacer(modifier = Modifier.size(5.dp))
-
-        //Spacer(modifier = Modifier.size(5.dp))
 
     }
     Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.primary)
