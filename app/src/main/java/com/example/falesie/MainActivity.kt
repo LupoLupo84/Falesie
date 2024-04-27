@@ -12,6 +12,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -24,6 +26,7 @@ import com.example.falesie.data.firestore.model.Falesia
 import com.example.falesie.data.firestore.model.User
 import com.example.falesie.data.firestore.model.Via
 import com.example.falesie.data.firestore.model.ViaScalata
+import com.example.falesie.screen.AggiornaViaScreen
 import com.example.falesie.screen.LoginScreen
 import com.example.falesie.screen.FalesieScreen
 import com.example.falesie.screen.GestioneFalesieScreen
@@ -42,24 +45,27 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
-    lateinit var factory : FalesieViewModelFactory
+    lateinit var factory: FalesieViewModelFactory
 
 
     companion object {
         val auth by lazy { Firebase.auth }
         lateinit var userCorrente: User
+
         //var userCorrente = User()
         //var userCorrente: User = User()
         //var userCorrente = FirestoreClass().firstLoadUserData()
-        var listaVie: ArrayList<Via> = ArrayList()                          // Firestore  Tutte le vie presenti nel db
-        var listaFalesie: ArrayList<Falesia> = ArrayList()                  // Firestore  Tutte le falesie presenti nel db
-//        var listaVieSelezionate: ArrayList<Via> = ArrayList()               // Vie presenti nella falesia corrente
+        var listaVie: ArrayList<Via> =
+            ArrayList()                          // Firestore  Tutte le vie presenti nel db
+        var listaFalesie: ArrayList<Falesia> =
+            ArrayList()                  // Firestore  Tutte le falesie presenti nel db
+
+        //        var listaVieSelezionate: ArrayList<Via> = ArrayList()               // Vie presenti nella falesia corrente
 //        var falesiaSelezionata:Falesia = Falesia()                          // Falesia selezionata per la modifica
 //        var viaSelezionata : Via = Via()
         //var arrayVieScalateUser: ArrayList<ViaScalata> = ArrayList()
-var arrayVieScalateUser: MutableList<ViaScalata> = arrayListOf()
+        var arrayVieScalateUser: MutableList<ViaScalata> = arrayListOf()
     }
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,15 +92,14 @@ var arrayVieScalateUser: MutableList<ViaScalata> = arrayListOf()
 
 
                 //MODIFICHE PER TEST
-                Surface(modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background)
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                )
                 {
                     //HomeScreen(onNavigate = {})      //navigationHost
                     //JetShoppingApp()                                                  //AVVIA LA APP JETSHOPPING
                 }
-
-
-
 
 
 
@@ -127,16 +132,24 @@ var arrayVieScalateUser: MutableList<ViaScalata> = arrayListOf()
                         arguments = listOf(
                             navArgument("nomeFalesia") { type = NavType.StringType }
                         )
-                    ){backStackEntry ->
+                    ) { backStackEntry ->
                         val arguments = requireNotNull(backStackEntry.arguments)
                         val nomeFalesia =
                             arguments.getString("nomeFalesia") ?: error("")
-                        val falesieViewModel : FalesieViewModel = viewModel(factory = factory)
-                        val vieNelSettore = falesieViewModel.vieNellaFalesiaSettore.collectAsState(initial = emptyList())
-                        val vieNellaFalesia = falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
-                        //VieScreen(navController, nomeFalesia, factory, falesieViewModel, vieNelSettore)
-                        VieScreen(navController, nomeFalesia, factory, falesieViewModel, vieNellaFalesia)
-                        //VieScreen(navController, nomeFalesia, factory, falesieViewModel)
+                        val falesieViewModel: FalesieViewModel = viewModel(factory = factory)
+                        val vieNellaFalesia by falesieViewModel.vieNellaFalesia.observeAsState()
+//                        val vieNellaFalesia =
+//                            falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
+                        vieNellaFalesia?.let {it ->
+                            VieScreen(
+                                navController,
+                                nomeFalesia,
+                                factory,
+                                falesieViewModel,
+                                //vieNellaFalesia
+                                it
+                            )
+                        }
                     }
 
                     //MODIFICA VIE
@@ -145,40 +158,79 @@ var arrayVieScalateUser: MutableList<ViaScalata> = arrayListOf()
                         arguments = listOf(
                             navArgument("nomeFalesia") { type = NavType.StringType }
                         )
-                    ){backStackEntry ->
+                    ) { backStackEntry ->
                         val arguments = requireNotNull(backStackEntry.arguments)
                         val nomeFalesia =
                             arguments.getString("nomeFalesia") ?: error("")
-                        val falesieViewModel : FalesieViewModel = viewModel(factory = factory)
-                        //val vieNelSettore = falesieViewModel.vieNellaFalesiaSettore.collectAsState(initial = emptyList())
-                        val vieNellaFalesia = falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
-                        //VieScreen(navController, nomeFalesia, factory, falesieViewModel, vieNelSettore)
-                        ModificaVieScreen(navController, nomeFalesia, factory, falesieViewModel, vieNellaFalesia)
-                        //VieScreen(navController, nomeFalesia, factory, falesieViewModel)
+                        val falesieViewModel: FalesieViewModel = viewModel(factory = factory)
+                        val vieNellaFalesia by falesieViewModel.vieNellaFalesia.observeAsState()
+//                        val vieNellaFalesia =
+//                            falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
+                        vieNellaFalesia?.let { it->
+                            ModificaVieScreen(
+                                navController,
+                                nomeFalesia,
+                                factory,
+                                falesieViewModel,
+                                it
+                                //vieNellaFalesia
+                            )
+                        }
                     }
 
+
+
+                    //AGGIORNA VIA
+                    composable(
+                        route = "${"AggiornaViaScreen"}/{idVia}",
+                        arguments = listOf(
+                            navArgument("idVia") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val arguments = requireNotNull(backStackEntry.arguments)
+                        val idVia =
+                            arguments.getString("idVia") ?: error("")
+                        val falesieViewModel: FalesieViewModel = viewModel(factory = factory)
+                        val vieNellaFalesia by falesieViewModel.vieNellaFalesia.observeAsState()
+//                        val vieNellaFalesia =
+//                            falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
+                        //falesieViewModel.getViaId(idVia)
+                        falesieViewModel.getViaIdMod(idVia)
+                        val viaDaMod by falesieViewModel.viaDaMod.observeAsState()
+                        viaDaMod?.let {it ->
+                            vieNellaFalesia?.let { it2 ->
+                                AggiornaViaScreen(
+                                    navController,
+                                    idVia,
+                                    factory,
+                                    falesieViewModel,
+                                    it2,
+                                    it      //passa direttamente viaDaMod
+                                )
+                            }
+                        }
                     }
+
+
+
+
 
 
                 }
 
 
             }
+
+
         }
-
     }
 
+}
 
 
-
-
-
-
-
-
-    @Composable
-    fun JetShoppingApp(){
-        JetShopingNavigation()
-    }
+@Composable
+fun JetShoppingApp() {
+    JetShopingNavigation()
+}
 
 

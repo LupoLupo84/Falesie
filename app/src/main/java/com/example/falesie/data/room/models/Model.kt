@@ -11,13 +11,13 @@ data class Via(
     @ColumnInfo(name = "via_id")
     @PrimaryKey(autoGenerate = false)
     val id: String,
-    val viaName:String,
-    val settore:String,
+    var viaName:String,
+    var settore:String,
     val numero: Int,
-    val falesiaIdFk:String,
-    val grado: String,
-    val protezioni:Int,
-    val altezza: Int,
+    var falesiaIdFk:String,
+    var grado: String,
+    var protezioni:Int,
+    var altezza: Int,
     val immagine: String,
     val isChecked:Boolean
 )

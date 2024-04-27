@@ -1,5 +1,6 @@
 package com.example.falesie.data.room
 
+import androidx.lifecycle.LiveData
 import com.example.falesie.data.room.models.Falesia
 import com.example.falesie.data.room.models.Via
 import dagger.Module
@@ -14,13 +15,18 @@ interface ViaRepository {
 
     suspend fun delete(via: Via)
 
-    fun getAllVie(): Flow<List<Via>>
+    suspend fun getAllVie(): List<Via>
+    fun getVieFalesia(falesia:String): List<Via>
 
-    fun getVia(via_id:Int): Flow<Via>
+//    fun getVieFalesiaSettore(falesia:String,settore:String): Flow<List<Via>>
 
-    fun getVieFalesia(falesia:String): Flow<List<Via>>
+    suspend fun getNomiSettore(falesia_id:String): List<String>
 
-    fun getVieFalesiaSettore(falesia:String,settore:String): Flow<List<Via>>
+
+
+    fun getVia(via_id:String): Via
+
+
 }
 
 
@@ -32,8 +38,14 @@ interface FalesiaRepository{
 
     suspend fun delete(falesia: Falesia)
 
-    fun getAllFalesie(): Flow<List<Falesia>>
+    suspend fun getAllFalesieNew(): List<Falesia>
 
-    fun getFalesia(falesia_id:Int): Flow<Falesia>
+    suspend fun getNomeFalesia(falesia_id:String): String
+
+    suspend fun getNomiFalesie(): List<String>
+
+
+
+
 
 }

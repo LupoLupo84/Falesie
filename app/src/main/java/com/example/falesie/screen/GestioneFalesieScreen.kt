@@ -25,6 +25,8 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,7 +51,10 @@ fun GestioneFalesieScreen(
     val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val listaFalesie = falesieViewModel.falesieList.collectAsState(initial = emptyList())
+
+    falesieViewModel.getFalesieList()
+    val listaFalesie by falesieViewModel.falesieList.observeAsState()
+
 
 
     ModalNavigationDrawer(
@@ -59,22 +64,27 @@ fun GestioneFalesieScreen(
         }
     ) {
 
-        Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehaivor.nestedScrollConnection),
-            topBar = {
-                topAppBarCustom(
-                    scrollBehaivor = scrollBehaivor,
-                    scope = scope,
-                    drawerState = drawerState,
-                    titolo = "Gestione Falesie"
-                )
-            },
-            content = {
-                //CustomList(paddingValues = it)
-                GestioneFalesieFrame(paddingValues = it, navController, listaFalesie)
+        listaFalesie?.let {it2->
 
-            }
-        )
+            Scaffold(
+                modifier = Modifier.nestedScroll(scrollBehaivor.nestedScrollConnection),
+                topBar = {
+                    topAppBarCustom(
+                        scrollBehaivor = scrollBehaivor,
+                        scope = scope,
+                        drawerState = drawerState,
+                        titolo = "Gestione Falesie"
+                    )
+                },
+                content = {
+                    //CustomList(paddingValues = it)
+                    GestioneFalesieFrame(paddingValues = it, navController, it2)
+
+                }
+            )
+        }
+
+
 
 
     }
@@ -86,9 +96,10 @@ fun GestioneFalesieScreen(
 fun GestioneFalesieFrame(
     paddingValues: PaddingValues,
     navController: NavHostController,
-    listaFalesie: State<List<Falesia>>
+    //listaFalesie: State<List<Falesia>>
+    listaFalesie: List<Falesia>
 ) {
-    val listSorted = listaFalesie.value.sortedBy { it.nome }
+    val listSorted = listaFalesie.sortedBy { it.nome }
     Scaffold()
     {
         LazyColumn(

@@ -1,5 +1,6 @@
 package com.example.falesie.data.room
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -24,17 +25,19 @@ interface ViaDao{
     suspend fun delete(via: Via)
 
     @Query("SELECT * FROM vie")
-    fun getAllVie():Flow<List<Via>>
+    fun getAllVieNew():List<Via>
+
+@Query("SELECT * FROM vie WHERE falesiaIdFk =:falesia ORDER BY numero")
+fun getVieFalesia(falesia:String):List<Via>
+
+//    @Query("SELECT * FROM vie WHERE falesiaIdFk =:falesia AND settore =:settore ORDER BY numero")
+//    fun getVieFalesiaSettore(falesia:String,settore:String):Flow<List<Via>>
+
+    @Query("SELECT settore FROM vie WHERE falesiaIdFk =:falesia_id")
+    fun getNomiSettore(falesia_id: String):List<String>
 
     @Query("SELECT * FROM vie WHERE via_id =:via_id")
-    fun getVia(via_id:Int):Flow<Via>
-
-    @Query("SELECT * FROM vie WHERE falesiaIdFk =:falesia ORDER BY numero")
-    fun getVieFalesia(falesia:String):Flow<List<Via>>
-
-
-    @Query("SELECT * FROM vie WHERE falesiaIdFk =:falesia AND settore =:settore ORDER BY numero")
-    fun getVieFalesiaSettore(falesia:String,settore:String):Flow<List<Via>>
+    fun getViaMod(via_id:String):Via
 
 
 }
@@ -55,7 +58,17 @@ interface FalesiaDao{
     @Query("SELECT * FROM falesia")
     fun getAllFalesie():Flow<List<Falesia>>
 
-    @Query("SELECT * FROM falesia WHERE falesia_id =:falesia_id")
-    fun getFalesia(falesia_id:Int):Flow<Falesia>
+    @Query("SELECT nome FROM falesia WHERE falesia_id =:falesia_id")
+    fun getNomeFalesia(falesia_id:String):String
+
+    @Query("SELECT nome FROM falesia")
+    fun getNomiFalesie():List<String>
+
+    @Query("SELECT * FROM falesia")
+    fun getAllFalesieNew():List<Falesia>
+
+
+
+
 
 }

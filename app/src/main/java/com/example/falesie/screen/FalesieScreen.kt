@@ -32,9 +32,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -78,8 +77,13 @@ fun FalesieScreen(
         )
     }
 
-    val listaVie = falesieViewModel.vieList.collectAsState(initial = emptyList())
-    val listaFalesie = falesieViewModel.falesieList.collectAsState(initial = emptyList())
+    falesieViewModel.getVieList()
+    falesieViewModel.getFalesieList()
+    val listaVie by falesieViewModel.vieList.observeAsState()
+    val listaFalesie by falesieViewModel.falesieList.observeAsState()
+
+    //val listaVie = falesieViewModel.vieList.collectAsState(initial = emptyList())
+    //val listaFalesie = falesieViewModel.falesieList.collectAsState(initial = emptyList())
     val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -95,27 +99,39 @@ fun FalesieScreen(
             ModalDrawerSheetMenu(navController = navController)
         }
     ) {
-        Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehaivor.nestedScrollConnection),
-            topBar = {
-                topAppBarCustom(
-                    scrollBehaivor = scrollBehaivor,
-                    scope = scope,
-                    drawerState = drawerState,
-                    titolo = "Falesie"
-                )
-            },
-            content = {
-                ListaFalesie(paddingValues = it, navController, listaVie, listaFalesie,{
-                    //chiamata di ritorno in onSelectFalesia
-                    Constants.FALESIACORRENTEID = it.id
-                    Log.d("Ritorno della chiamata", it.nome)
-                    val route = "${"VieScreen"}/${it.nome}"
-                    navController.navigate(route)
-                    // esempio navArgument https://www.reddit.com/r/JetpackCompose/comments/15gieu3/how_to_pass_arguments_to_a_composable_using/
-                })
-            }
-        )
+        listaFalesie?.let {
+
+            Scaffold(
+                modifier = Modifier.nestedScroll(scrollBehaivor.nestedScrollConnection),
+                topBar = {
+                    topAppBarCustom(
+                        scrollBehaivor = scrollBehaivor,
+                        scope = scope,
+                        drawerState = drawerState,
+                        titolo = "Falesie"
+                    )
+                },
+                content = {
+
+                    ListaFalesie(paddingValues = it, navController, listaVie, listaFalesie) {
+                        //chiamata di ritorno in onSelectFalesia
+                        Constants.FALESIACORRENTEID = it.id
+                        Log.d("Ritorno della chiamata", it.nome)
+                        val route = "${"VieScreen"}/${it.nome}"
+                        navController.navigate(route)
+                        // esempio navArgument https://www.reddit.com/r/JetpackCompose/comments/15gieu3/how_to_pass_arguments_to_a_composable_using/
+
+
+
+
+                    }
+                }
+            )
+
+
+
+        }
+
 
 
     }
@@ -128,11 +144,12 @@ fun FalesieScreen(
 fun ListaFalesie(
     paddingValues: PaddingValues,
     navController: NavHostController,
-    listaVie : State<List<Via>>,
-    listaFalesie : State<List<Falesia>>,
-    onSelectFalesia : (Falesia) -> Unit,
+    listaVie: List<Via>?,
+    listaFalesie: List<Falesia>?,
+    onSelectFalesia: (Falesia) -> Unit,
 ) {
-    var listSorted = listaFalesie.value.sortedBy { it.nome }
+    //var listSorted = listaFalesie.value.sortedBy { it.nome }
+    var listSorted = listaFalesie?.sortedBy { it.nome }
     Scaffold()
     {
         LazyColumn(
@@ -141,7 +158,8 @@ fun ListaFalesie(
         ) {
             items(
                 //items = listaFalesie.value,
-                items = listSorted,
+                //items = listSorted,
+                items = listSorted!!,
                 key = {item -> item.id}
             ){ item ->
                 ListItem(falesia = item, { onSelectFalesia(it) })
@@ -149,11 +167,6 @@ fun ListaFalesie(
         }
     }
 }
-
-
-
-
-
 
 
 

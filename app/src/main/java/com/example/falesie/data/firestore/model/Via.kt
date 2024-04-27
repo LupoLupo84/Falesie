@@ -6,7 +6,7 @@ import android.os.Parcelable
 data class Via(
     var id: String = "",
     var falesia: String = "",
-    val settore: String = "",
+    var settore: String = "",
     val numero: Int = 0,
     var nome: String = "",
     val grado: String = "",

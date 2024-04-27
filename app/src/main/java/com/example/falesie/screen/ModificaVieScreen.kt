@@ -42,7 +42,6 @@ import com.example.falesie.FalesieViewModel
 import com.example.falesie.FalesieViewModelFactory
 import com.example.falesie.data.room.models.Via
 
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ModificaVieScreen(
@@ -50,27 +49,24 @@ fun ModificaVieScreen(
     nomeFalesia: String,
     factory: FalesieViewModelFactory,
     falesieViewModel: FalesieViewModel = viewModel(factory = factory),
-    vieNellaFalesia: State<List<Via>>,
+    //vieNellaFalesia: State<List<Via>>,
+    vieNellaFalesia: List<Via>,
 ) {
     //val vieNellaFalesia = falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
-    Log.d("Vie nella falesia", vieNellaFalesia.value.size.toString())
-
+    Log.d("Vie nella falesia", vieNellaFalesia.size.toString())
     val settoriFalesia: MutableList<String> = mutableListOf("Tutti i settori")
-
     var tempSettoreCorrente = Constants.SETTORECORRENTE
+    vieNellaFalesia.sortedBy { it.settore }
 
-    vieNellaFalesia.value.sortedBy { it.settore }
-
-    for (i in vieNellaFalesia.value) {
+    for (i in vieNellaFalesia) {
         if (i.settore != tempSettoreCorrente && !settoriFalesia.contains(i.settore)) {
             tempSettoreCorrente = i.settore
             settoriFalesia.add(tempSettoreCorrente)
             Log.d("SETTORE", tempSettoreCorrente)
         }
     }
+
     Log.d("NUMERO DI SETTORI NELLA FALESIA", settoriFalesia.size.toString())
-
-
     val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -95,11 +91,9 @@ fun ModificaVieScreen(
             }
         ) {
             val secondPadding = it.calculateTopPadding()
-            var columnHeightDp by remember { mutableStateOf(0.dp) }
+            val columnHeightDp by remember { mutableStateOf(0.dp) }
             val localDensity = LocalDensity.current
-
-            val listSorted = vieNellaFalesia.value.toList()
-
+            val listSorted = vieNellaFalesia.toList()
 
 
             LazyColumn(
@@ -115,8 +109,8 @@ fun ModificaVieScreen(
                     VisualizzaVie(via = item, {
                         //GESTIONE onSelectVia
                         //Constants.FALESIACORRENTEID = it.id
-                        //val route = "${"ModificaVieScreen"}/${it.nome}"
-                        //navController.navigate(route)
+                        val route = "${"AggiornaViaScreen"}/${it.id}"
+                        navController.navigate(route)
                     })
 
                 }
