@@ -1,6 +1,8 @@
 package com.example.falesie.screen
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,12 +24,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -42,6 +42,8 @@ import com.example.falesie.FalesieViewModel
 import com.example.falesie.FalesieViewModelFactory
 import com.example.falesie.data.room.models.Via
 
+
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ModificaVieScreen(
@@ -52,6 +54,15 @@ fun ModificaVieScreen(
     //vieNellaFalesia: State<List<Via>>,
     vieNellaFalesia: List<Via>,
 ) {
+
+    //val wInfo = LocalContext.current.applicationContext.getSystemService(Context.)
+    //val macAddress = wInfo.
+//    val android_device_id =
+//        Settings.Secure.getString(Application().contentResolver, Settings.Secure.ANDROID_ID)
+
+
+//    Log.d("MAC ADDRESS", android_device_id)
+
     //val vieNellaFalesia = falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
     Log.d("Vie nella falesia", vieNellaFalesia.size.toString())
     val settoriFalesia: MutableList<String> = mutableListOf("Tutti i settori")

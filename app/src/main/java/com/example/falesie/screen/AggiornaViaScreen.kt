@@ -25,7 +25,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -34,7 +33,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -80,22 +78,22 @@ fun AggiornaViaScreen(
 
     var nomeFalesia = ""
     nomeFalesiaViewModel?.let {
-        Log.d("RISPOSTA NEL MAIN",
+        Log.d(
+            "RISPOSTA NEL MAIN",
             it
-    )
-        nomeFalesia= it
+        )
+        nomeFalesia = it
     }
 
 
 
 
 
-    if (viaDaModificare.falesiaIdFk == ""){
+    if (viaDaModificare.falesiaIdFk == "") {
         viaDaModificare.falesiaIdFk = viaDaModificare.falesiaIdFk
         //falesieViewModel.getFalesia(viaDaModificare.falesiaIdFk)
         Log.d("FALESIA ID CORRENTE", viaDaModificare.falesiaIdFk)
     }
-
 
 
     val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
@@ -157,13 +155,11 @@ fun AggiornaViaScreen(
                         ) {
 
 
-
-
-                                    EditaDropdown(
-                                        testo ="falesia",
-                                        selezioneAttuale = nomeFalesia,
-                                        selezioneMenu = emptyList()
-                                    )
+                            EditaDropdown(
+                                testo = "falesia",
+                                selezioneAttuale = nomeFalesia,
+                                selezioneMenu = emptyList()
+                            )
 
 
 
@@ -192,9 +188,9 @@ fun AggiornaViaScreen(
 
 
                             Row {
-                                Column (
+                                Column(
                                     modifier = Modifier.weight(1F)
-                                ){
+                                ) {
                                     viaDaModificare.grado =
                                         EditaDropdown(
                                             "grado",
@@ -228,8 +224,8 @@ fun AggiornaViaScreen(
                                 }
 
                             }
-                            
-                            Row{
+
+                            Row {
                                 Column(
                                     modifier = Modifier.fillMaxSize(),
                                     horizontalAlignment = Alignment.CenterHorizontally
@@ -241,7 +237,10 @@ fun AggiornaViaScreen(
                                             Log.d("Nome", viaDaModificare.viaName)
                                             Log.d("Grado", viaDaModificare.grado)
                                             Log.d("Altezza", viaDaModificare.altezza.toString())
-                                            Log.d("Protezioni", viaDaModificare.protezioni.toString())
+                                            Log.d(
+                                                "Protezioni",
+                                                viaDaModificare.protezioni.toString()
+                                            )
                                         }
 
                                     ) {
@@ -250,21 +249,6 @@ fun AggiornaViaScreen(
                                 }
 
                             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
                         }
@@ -293,7 +277,7 @@ fun EditaTesto(
     //var ritorno = selezionaAttuale
     //var text by remember { mutableStateOf(TextFieldValue("")) }
     var text by remember { mutableStateOf(selezioneAttuale) }
-    if (text == ""){
+    if (text == "") {
         text = selezioneAttuale
     }
 
@@ -306,14 +290,14 @@ fun EditaTesto(
             text = testo
         )
     }
-    Row (
+    Row(
         modifier = Modifier.padding(start = 12.dp)
-    ){
+    ) {
         //BasicTextField(value = "", onValueChange = {}, Modifier.fillMaxWidth())
         BasicTextField(
             textStyle = TextStyle.Default.copy(fontSize = 30.sp),
             value = text,
-            onValueChange ={newText ->
+            onValueChange = { newText ->
                 text = newText
             },
             singleLine = true,
@@ -324,18 +308,18 @@ fun EditaTesto(
 
     Divider(
         modifier = Modifier.padding(top = 2.dp, bottom = 2.dp),
-        thickness = 2.dp)
+        thickness = 2.dp
+    )
     return text
 
 }
 
 
-
 @Composable
 fun EditaDropdown(
-    testo : String,
-    selezioneAttuale : String,
-    selezioneMenu : List<String>
+    testo: String,
+    selezioneAttuale: String,
+    selezioneMenu: List<String>
 ): String {
     var ritorno = ""
     Row(
@@ -347,26 +331,27 @@ fun EditaDropdown(
             text = testo
         )
     }
-    Row (
+    Row(
         modifier = Modifier.padding(start = 12.dp, top = 8.dp, bottom = 8.dp)
-    ){
+    ) {
         Box(
 
-        ){
+        ) {
             ritorno =
-            dropDownMenu(
-                //secondPadding,
-                30,
-                selezioneAttuale,
-                selezioneMenu
-                //mutableListOf("Settore 1", "Settore 2", "Settore 3")
-            )
+                dropDownMenu(
+                    //secondPadding,
+                    30,
+                    selezioneAttuale,
+                    selezioneMenu
+                    //mutableListOf("Settore 1", "Settore 2", "Settore 3")
+                )
         }
     }
 
     Divider(
         modifier = Modifier.padding(top = 2.dp, bottom = 2.dp),
-        thickness = 2.dp)
+        thickness = 2.dp
+    )
     return ritorno
 }
 
@@ -376,13 +361,13 @@ fun dropDownMenu(
     dimensione: Int,
     selezioneAttuale: String,
     settoriFalesia: List<String>
-):String {
+): String {
     var columnHeightDp by remember { mutableStateOf(0.dp) }
     val localDensity = LocalDensity.current
     //val settoriFalesia: MutableList<String> = mutableListOf("Settore 1", "Settore 2", "Settore 3")
     val selezione = rememberSaveable { mutableStateOf(selezioneAttuale) }
     //if (selezione.value == "" || selezione.value == "0"){
-    if (selezione.value == ""){
+    if (selezione.value == "") {
         selezione.value = selezioneAttuale
     }
 
@@ -418,9 +403,9 @@ fun dropDownMenu(
                             apriMenu.value = !apriMenu.value
                             selezione.value = settore
                         }
-                            //.background(color = MaterialTheme.colorScheme.secondaryContainer)
+                        //.background(color = MaterialTheme.colorScheme.secondaryContainer)
                         ,
-                        fontSize = (dimensione*0.7).sp,
+                        fontSize = (dimensione * 0.7).sp,
                         text = settore
 
                     )

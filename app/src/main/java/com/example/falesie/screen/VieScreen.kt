@@ -6,18 +6,14 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -26,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -36,16 +31,13 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -405,7 +397,8 @@ fun VieScreen(
                                                     .weight(1f)
                                             ) {
                                                 Row {
-                                                    Text(text = vieNellaFalesia[it].settore,
+                                                    Text(
+                                                        text = vieNellaFalesia[it].settore,
                                                         fontSize = 12.sp
                                                     )
                                                 }
@@ -439,7 +432,8 @@ fun VieScreen(
                                                 modifier = Modifier
                                                     .weight(1f)
                                             ) {
-                                                Text(text = "grado ${vieNellaFalesia[it].grado}",
+                                                Text(
+                                                    text = "grado ${vieNellaFalesia[it].grado}",
                                                     fontSize = 14.sp
                                                 )
                                             }
@@ -448,7 +442,8 @@ fun VieScreen(
                                                 modifier = Modifier
                                                     .weight(1f)
                                             ) {
-                                                Text(text = "altezza ${vieNellaFalesia[it].altezza} m",
+                                                Text(
+                                                    text = "altezza ${vieNellaFalesia[it].altezza} m",
                                                     fontSize = 14.sp
                                                 )
                                             }
@@ -456,7 +451,8 @@ fun VieScreen(
                                                 modifier = Modifier
                                                     .weight(1f)
                                             ) {
-                                                Text(text = "protezioni ${vieNellaFalesia[it].protezioni}",
+                                                Text(
+                                                    text = "protezioni ${vieNellaFalesia[it].protezioni}",
                                                     fontSize = 14.sp
                                                 )
                                             }

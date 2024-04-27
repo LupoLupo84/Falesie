@@ -3,6 +3,8 @@ package com.example.falesie.data.firestore
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import com.example.falesie.Aggiorna
 import com.example.falesie.Constants
@@ -23,9 +25,13 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 
 
-class FirestoreClass {
+class FirestoreClass{
     // Create a instance of Firebase Firestore
     private val mFireStore = FirebaseFirestore.getInstance()
+    //var listaVie2: ArrayList<Via> = ArrayList()
+    val listaVie2 = MutableLiveData<List<Via>>()
+
+
 
     fun registerUser(context: Context, userInfo: User, navController: NavHostController) {
 
@@ -89,22 +95,28 @@ class FirestoreClass {
             .document(getCurrentUserID())
             .get()
             .addOnSuccessListener { document ->
-                Log.d("LETTURA DOCUMENTO", document.toString())
 
-                // Here we have received the document snapshot which is converted into the User Data model object.
-                val loggedInUser = document.toObject(User::class.java)!!
-                userCorrente = loggedInUser
 
-                if (provenienza == "LoginScreen") {
-                    Toast.makeText(
-                        context,
-                        context.resources.getString(R.string.login_eseguito) + " " + userCorrente.nome + "!!",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Log.d("LETTURA DOCUMENTO", document.toString())
 
-                    navController.popBackStack()
-                    navController.navigate("FalesieScreen")
+                    // Here we have received the document snapshot which is converted into the User Data model object.
+                    val loggedInUser = document.toObject(User::class.java)
+
+                loggedInUser?.let { it2 ->
+                    userCorrente = loggedInUser
                 }
+
+                    if (provenienza == "LoginScreen") {
+                        Toast.makeText(
+                            context,
+                            context.resources.getString(R.string.login_eseguito) + " " + userCorrente.nome + "!!",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        navController.popBackStack()
+                        navController.navigate("FalesieScreen")
+                    }
+
 
             }
             .addOnFailureListener { e ->
@@ -212,6 +224,11 @@ class FirestoreClass {
     }
 
 
+
+
+
+
+
     fun leggiTutteLeVie(aggiorna: Aggiorna) {
         mFireStore.collection(Constants.VIA).get()
             .addOnCompleteListener { task ->
@@ -222,6 +239,9 @@ class FirestoreClass {
                         Log.i("*************Vie lette de Firestore", "${document.id}")
                         val via = document.toObject(Via::class.java)
                         listaVie.add(via)
+
+                        listaVie2.value = listaVie2.value?.plus(via) ?: listOf(via)
+
                         //Log.i("*************Vie lette de Firestore", "${list.size}")
                     }
                     aggiorna.aggiorna()

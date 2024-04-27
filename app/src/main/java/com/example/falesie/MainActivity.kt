@@ -3,15 +3,18 @@ package com.example.falesie
 //tutorial rooms db jetpack
 //https://www.youtube.com/watch?v=voMTReNRvUA&list=PLUPcj46QWTDWlxtIwE3A6VEWUFEO8nh0Z&index=7
 
+
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -27,14 +30,13 @@ import com.example.falesie.data.firestore.model.User
 import com.example.falesie.data.firestore.model.Via
 import com.example.falesie.data.firestore.model.ViaScalata
 import com.example.falesie.screen.AggiornaViaScreen
-import com.example.falesie.screen.LoginScreen
 import com.example.falesie.screen.FalesieScreen
 import com.example.falesie.screen.GestioneFalesieScreen
+import com.example.falesie.screen.LoginScreen
 import com.example.falesie.screen.ModificaVieScreen
 import com.example.falesie.screen.ProfiloScreen
 import com.example.falesie.screen.RegisterScreen
 import com.example.falesie.screen.VieScreen
-//import com.example.falesie.screen.VieScreen
 import com.example.falesie.ui.JetShopingNavigation
 import com.example.falesie.ui.theme.FalesieTheme
 import com.google.firebase.auth.ktx.auth
@@ -42,34 +44,32 @@ import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity() : ComponentActivity() {
     @Inject
     lateinit var factory: FalesieViewModelFactory
-
 
     companion object {
         val auth by lazy { Firebase.auth }
         lateinit var userCorrente: User
 
-        //var userCorrente = User()
-        //var userCorrente: User = User()
-        //var userCorrente = FirestoreClass().firstLoadUserData()
-        var listaVie: ArrayList<Via> =
-            ArrayList()                          // Firestore  Tutte le vie presenti nel db
-        var listaFalesie: ArrayList<Falesia> =
-            ArrayList()                  // Firestore  Tutte le falesie presenti nel db
 
-        //        var listaVieSelezionate: ArrayList<Via> = ArrayList()               // Vie presenti nella falesia corrente
-//        var falesiaSelezionata:Falesia = Falesia()                          // Falesia selezionata per la modifica
-//        var viaSelezionata : Via = Via()
-        //var arrayVieScalateUser: ArrayList<ViaScalata> = ArrayList()
+        var listaVie: ArrayList<Via> = ArrayList()                          // Firestore  Tutte le vie presenti nel db
+        var listaFalesie: ArrayList<Falesia> = ArrayList()                  // Firestore  Tutte le falesie presenti nel db
         var arrayVieScalateUser: MutableList<ViaScalata> = arrayListOf()
     }
 
 
+    fun signOut(){
+        auth.signOut()
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
 
         val currentUserID = FirestoreClass().getCurrentUserID()
@@ -78,11 +78,11 @@ class MainActivity : ComponentActivity() {
         userCorrente = FirestoreClass().firstLoadUserData()
         Log.d("TEST", userCorrente.email)
 
-        var startDestination = ""
-        if (currentUserID.isNotEmpty()) {       // se ho caricato i dati dell'utente
-            startDestination = "FalesieScreen"
+        //var startDestination = ""
+        val startDestination = if (currentUserID.isNotEmpty()) {       // se ho caricato i dati dell'utente
+            "FalesieScreen"
         } else {                                // chiedo di effettuare il login
-            startDestination = "LoginScreen"
+            "LoginScreen"
         }
 
 
@@ -107,11 +107,9 @@ class MainActivity : ComponentActivity() {
                 NavHost(
                     navController = navController,
                     startDestination = startDestination                      //"LoginScreen"
-                    //test applicazione
-                    //startDestination = "DbRoomScreen"
                 ) {
                     composable("LoginScreen") {
-                        LoginScreen(navController)
+                        LoginScreen(navController, factory)
                     }
                     composable("FalesieScreen") {
                         Constants.SETTORECORRENTE = "Tutti i settori"
@@ -138,15 +136,12 @@ class MainActivity : ComponentActivity() {
                             arguments.getString("nomeFalesia") ?: error("")
                         val falesieViewModel: FalesieViewModel = viewModel(factory = factory)
                         val vieNellaFalesia by falesieViewModel.vieNellaFalesia.observeAsState()
-//                        val vieNellaFalesia =
-//                            falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
                         vieNellaFalesia?.let {it ->
                             VieScreen(
                                 navController,
                                 nomeFalesia,
                                 factory,
                                 falesieViewModel,
-                                //vieNellaFalesia
                                 it
                             )
                         }
@@ -164,8 +159,6 @@ class MainActivity : ComponentActivity() {
                             arguments.getString("nomeFalesia") ?: error("")
                         val falesieViewModel: FalesieViewModel = viewModel(factory = factory)
                         val vieNellaFalesia by falesieViewModel.vieNellaFalesia.observeAsState()
-//                        val vieNellaFalesia =
-//                            falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
                         vieNellaFalesia?.let { it->
                             ModificaVieScreen(
                                 navController,
@@ -173,7 +166,6 @@ class MainActivity : ComponentActivity() {
                                 factory,
                                 falesieViewModel,
                                 it
-                                //vieNellaFalesia
                             )
                         }
                     }
@@ -192,9 +184,6 @@ class MainActivity : ComponentActivity() {
                             arguments.getString("idVia") ?: error("")
                         val falesieViewModel: FalesieViewModel = viewModel(factory = factory)
                         val vieNellaFalesia by falesieViewModel.vieNellaFalesia.observeAsState()
-//                        val vieNellaFalesia =
-//                            falesieViewModel.vieNellaFalesia.collectAsState(initial = emptyList())
-                        //falesieViewModel.getViaId(idVia)
                         falesieViewModel.getViaIdMod(idVia)
                         val viaDaMod by falesieViewModel.viaDaMod.observeAsState()
                         viaDaMod?.let {it ->
@@ -204,10 +193,26 @@ class MainActivity : ComponentActivity() {
                                     idVia,
                                     factory,
                                     falesieViewModel,
-                                    it2,
-                                    it      //passa direttamente viaDaMod
+                                    it2,    //passa vieNellaFalesia
+                                    it      //passa viaDaMod
                                 )
                             }
+                        }
+                    }
+
+
+
+                    // se premo back e il mio navcontroller si trova nella pagina "FalesieScreen" termino la app e la rimuovo dallo stack
+                    onBackPressedDispatcher.addCallback( /* lifecycle owner */) {
+                        // Back is pressed... Finishing the activity
+                        if (navController.currentDestination?.route.toString() == "FalesieScreen" ||
+                            navController.currentDestination?.route.toString() == "LoginScreen"
+                            ) {
+                            Log.d(
+                                "TERMINA APPLICAZIONE",
+                                navController.currentDestination?.route.toString()
+                            )
+                            finishAndRemoveTask()
                         }
                     }
 
@@ -225,7 +230,26 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+//finishAndRemoveTask()
 
 
 @Composable

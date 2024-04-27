@@ -60,15 +60,30 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.falesie.FalesieViewModel
+import com.example.falesie.FalesieViewModelFactory
 import com.example.falesie.MainActivity.Companion.auth
 import com.example.falesie.R
 import com.example.falesie.data.firestore.FirestoreClass
+import java.io.File
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(
+    navController: NavHostController,
+    factory: FalesieViewModelFactory,
+) {
+    val falesieViewModel: FalesieViewModel = viewModel(factory = factory)
+
+    // se ho creato almeno una volta il database la prima volta che entro nella schermata login
+    // svuoto completamente i database
+    val directory = File("/data/data/" + LocalContext.current.packageName + "/databases/")
+    if (directory.exists()) {
+        falesieViewModel.svuotaDatabase()
+    }
 
     // MODAL NAVIGATION DRAWER
     //https://www.youtube.com/watch?v=Fp-RB1lDkgo&t=75s
@@ -109,7 +124,6 @@ fun LoginScreen(navController: NavHostController) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginFrame(paddingValues: PaddingValues, navController: NavHostController) {
 

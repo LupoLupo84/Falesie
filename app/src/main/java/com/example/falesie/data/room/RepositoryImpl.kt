@@ -2,11 +2,10 @@ package com.example.falesie.data.room
 
 import com.example.falesie.data.room.models.Falesia
 import com.example.falesie.data.room.models.Via
-import kotlinx.coroutines.flow.Flow
 
 
 //******************************************* VIA ****************************************************
-class ViaRepositoryImpl(private val dao : ViaDao) : ViaRepository {
+class ViaRepositoryImpl(private val dao: ViaDao) : ViaRepository {
     override suspend fun insert(via: Via) {
         dao.insert(via)
     }
@@ -22,13 +21,10 @@ class ViaRepositoryImpl(private val dao : ViaDao) : ViaRepository {
     override suspend fun getAllVie(): List<Via> {
         return dao.getAllVieNew()
     }
-override fun getVieFalesia(falesia: String): List<Via> {
-    return dao.getVieFalesia(falesia)
-}
 
-//    override fun getVieFalesiaSettore(falesia: String, settore: String): Flow<List<Via>> {
-//        return dao.getVieFalesiaSettore(falesia, settore)
-//    }
+    override fun getVieFalesia(falesia: String): List<Via> {
+        return dao.getVieFalesia(falesia)
+    }
 
     override suspend fun getNomiSettore(falesia_id: String): List<String> {
         return dao.getNomiSettore(falesia_id)
@@ -38,12 +34,16 @@ override fun getVieFalesia(falesia: String): List<Via> {
         return dao.getViaMod(via_id)
     }
 
+    override suspend fun deleteDatabaseVie() {
+        return dao.deleteDatabaseVie()
+    }
+
 }
 
 
 //***************************************** FALESIA **************************************************
 
-class FalesiaRepositoryImpl(private val dao : FalesiaDao) : FalesiaRepository {
+class FalesiaRepositoryImpl(private val dao: FalesiaDao) : FalesiaRepository {
     override suspend fun insert(falesia: Falesia) {
         dao.insert(falesia)
     }
@@ -69,6 +69,9 @@ class FalesiaRepositoryImpl(private val dao : FalesiaDao) : FalesiaRepository {
         return dao.getNomiFalesie()
     }
 
+    override suspend fun deleteDatabaseFalesia() {
+        return dao.deleteDatabaseFalesia()
+    }
 
 
 }

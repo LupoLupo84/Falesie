@@ -1,7 +1,8 @@
 package com.example.falesie.screen
 
+
+import android.content.DialogInterface
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.BlurLinear
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
@@ -45,33 +47,35 @@ import coil.request.ImageRequest
 import com.example.falesie.MainActivity
 import com.example.falesie.MainActivity.Companion.userCorrente
 import com.example.falesie.MenuItem
-import com.example.falesie.R
 import com.example.falesie.data.firestore.FirestoreClass
-import com.example.falesie.data.firestore.model.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
-// Contenuto del manu laterale
+// Contenuto del menu laterale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModalDrawerSheetMenu(
     navController: NavHostController,
     //onEvent: ((ViarEvent) -> Unit)?
 ) {
-
-    var user = remember { mutableStateOf(userCorrente) }
-    Log.d("ModalDrawerSheetMenu USER", user.value.email)
+    val myContext = LocalContext.current
 
     val listaDeiMenu = listOf(
         MenuItem(id = "Profilo", title = "Profilo", "Profilo", Icons.Filled.Person, false),
         MenuItem(id = "Falesie", title = "Falesie", "Falesie", Icons.Filled.BlurLinear, false),
-        MenuItem(id = "GestioneFalesie", title = "GestioneFalesie", "GestioneFalesie", Icons.Filled.Settings, true),
+        MenuItem(
+            id = "GestioneFalesie",
+            title = "GestioneFalesie",
+            "GestioneFalesie",
+            Icons.Filled.Settings,
+            true
+        ),
         MenuItem(id = "Logout", title = "Logout", "Logout", Icons.Filled.Logout, false),
         MenuItem(id = "DbRoom", title = "DbRoom", "DbRoom", Icons.Filled.SaveAlt, true),
+        MenuItem(id = "TEST", title = "Test", "Test", Icons.Filled.AcUnit, false),
     )
     var selectedItems by remember { mutableStateOf("") }
-    val context = LocalContext.current
 
 
 
@@ -116,31 +120,53 @@ fun ModalDrawerSheetMenu(
                         navController.popBackStack()
                         navController.navigate("ProfiloScreen")
                     }
+
                     "Falesie" -> {
                         Log.d("SELEZIONE", selectedItems)
                         selectedItems = ""
                         navController.popBackStack()
                         navController.navigate("FalesieScreen")
                     }
+
                     "GestioneFalesie" -> {
                         Log.d("SELEZIONE", selectedItems)
                         selectedItems = ""
                         navController.popBackStack()
                         navController.navigate("GestioneFalesieScreen")
                     }
+
                     "Logout" -> {
                         Log.d("SELEZIONE", selectedItems)
                         selectedItems = ""
-                        MainActivity.auth.signOut()
-                        userCorrente = User()
-                        Toast.makeText(
-                            context,
-                            context.resources.getString(R.string.disconnessione_eseguita),
-                            Toast.LENGTH_LONG
-                        ).show()
-                        navController.popBackStack()
-                        navController.navigate("LoginScreen")
+
+
+                        android.app.AlertDialog.Builder(LocalContext.current)
+                            .setTitle("Logout")
+                            .setMessage("Sei sicuro di eseguire il logout?")
+                            .setPositiveButton(
+                                "Si",
+                                DialogInterface.OnClickListener { dialog, which ->
+                                    // logout
+                                    //MainActivity.auth.signOut()
+                                    MainActivity::signOut
+
+
+                                    Log.d("userCorrente", userCorrente.toString())
+                                    //TODO cancella tutto il database all'uscita dell'account
+                                    //cancellaDatabase(myContext)
+                                    userCorrente = userCorrente.copy(id = "")
+                                    navController.popBackStack()
+                                    navController.navigate("LoginScreen")
+
+                                })
+                            .setNegativeButton(
+                                "No",
+                                DialogInterface.OnClickListener { dialog, which ->
+                                    // user doesn't want to logout
+                                })
+                            .show()
                     }
+
                     "DbRoom" -> {
                         Log.d("SELEZIONE", selectedItems)
                         selectedItems = ""
@@ -150,12 +176,34 @@ fun ModalDrawerSheetMenu(
 
                     }
 
+                    "Test" -> {
+                        Log.d("SELEZIONE", selectedItems)
+                        selectedItems = ""
 
+                        android.app.AlertDialog.Builder(LocalContext.current)
+                            .setTitle("Logout")
+                            .setMessage("Sei sicuro di eseguire il logout? \nIl database verrà cancellato")
+                            .setPositiveButton(
+                                "Si",
+                                DialogInterface.OnClickListener { dialog, which ->
+                                    // logout
+                                    MainActivity.auth.signOut()
+                                    //userCorrente = User()
+                                    //MainActivity::signOut
+                                    Log.d("userCorrente", userCorrente.toString())
+                                    //TODO cancella tutto il database all'uscita dell'account
+                                    navController.popBackStack()
+                                    navController.navigate("LoginScreen")
+                                })
+                            .setNegativeButton(
+                                "No",
+                                DialogInterface.OnClickListener { dialog, which ->
+                                    // user doesn't want to logout
+                                })
+                            .show()
+                    }
                 }
             }
-
-
-
         }
     }
 }
@@ -267,3 +315,4 @@ fun DrawProfileUser() {
     }
     Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.primary)
 }
+

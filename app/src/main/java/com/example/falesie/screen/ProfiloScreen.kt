@@ -15,7 +15,7 @@ import androidx.navigation.NavHostController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfiloScreen(navController: NavHostController){
+fun ProfiloScreen(navController: NavHostController) {
 
     val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
@@ -53,7 +53,7 @@ fun ProfiloScreen(navController: NavHostController){
 
 
 @Composable
-fun ProfiloFrame(paddingValues: PaddingValues, navController: NavHostController){
+fun ProfiloFrame(paddingValues: PaddingValues, navController: NavHostController) {
 
 }
 

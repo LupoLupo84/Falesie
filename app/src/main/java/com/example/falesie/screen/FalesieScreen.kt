@@ -63,27 +63,27 @@ import com.example.falesie.data.room.models.Via
 fun FalesieScreen(
     navController: NavHostController,
     factory: FalesieViewModelFactory,
-    falesieViewModel : FalesieViewModel = viewModel(factory = factory),
+    falesieViewModel: FalesieViewModel = viewModel(factory = factory),
 ) {
 
+
     if (userCorrente.aggiorna) {
-    salvaDbVieInLocale(factory)
-    salvaDbFalesieInLocale(factory)
+        salvaDbVieInLocale(factory)
+        salvaDbFalesieInLocale(factory)
         Log.d("Caricamento", "caricamento vie da db online")
 //TODO imposta a zero il valore aggiorna dell'userCorrente
-        val temp:HashMap<String, Any> = hashMapOf("aggiorna" to false)
+        val temp: HashMap<String, Any> = hashMapOf("aggiorna" to false)
         FirestoreClass().updateUserProfileData(
             temp
         )
     }
+
 
     falesieViewModel.getVieList()
     falesieViewModel.getFalesieList()
     val listaVie by falesieViewModel.vieList.observeAsState()
     val listaFalesie by falesieViewModel.falesieList.observeAsState()
 
-    //val listaVie = falesieViewModel.vieList.collectAsState(initial = emptyList())
-    //val listaFalesie = falesieViewModel.falesieList.collectAsState(initial = emptyList())
     val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -122,16 +122,12 @@ fun FalesieScreen(
                         // esempio navArgument https://www.reddit.com/r/JetpackCompose/comments/15gieu3/how_to_pass_arguments_to_a_composable_using/
 
 
-
-
                     }
                 }
             )
 
 
-
         }
-
 
 
     }
@@ -148,8 +144,7 @@ fun ListaFalesie(
     listaFalesie: List<Falesia>?,
     onSelectFalesia: (Falesia) -> Unit,
 ) {
-    //var listSorted = listaFalesie.value.sortedBy { it.nome }
-    var listSorted = listaFalesie?.sortedBy { it.nome }
+    val listSorted = listaFalesie?.sortedBy { it.nome }
     Scaffold()
     {
         LazyColumn(
@@ -157,11 +152,9 @@ fun ListaFalesie(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             items(
-                //items = listaFalesie.value,
-                //items = listSorted,
                 items = listSorted!!,
-                key = {item -> item.id}
-            ){ item ->
+                key = { item -> item.id }
+            ) { item ->
                 ListItem(falesia = item, { onSelectFalesia(it) })
             }
         }
@@ -169,12 +162,11 @@ fun ListaFalesie(
 }
 
 
-
-
 @Composable
 fun ListItem(
     falesia: Falesia,
-    onSelectFalesia: (Falesia) -> Unit) {
+    onSelectFalesia: (Falesia) -> Unit
+) {
     var pressioneIdFalesia by remember { mutableStateOf("") }
     val expanded = rememberSaveable { mutableStateOf(false) }
     val extraPadding by animateDpAsState(
@@ -218,7 +210,10 @@ fun ListItem(
                 }
 
                 OutlinedButton(onClick = { expanded.value = !expanded.value }) {
-                    Text(if (expanded.value) "Comprimi ▲" else "Espandi ▼", color = MaterialTheme.colorScheme.inversePrimary)
+                    Text(
+                        if (expanded.value) "Comprimi ▲" else "Espandi ▼",
+                        color = MaterialTheme.colorScheme.inversePrimary
+                    )
                 }
 
             }
@@ -260,20 +255,21 @@ fun ListItem(
                                     )
                                 }
                             }
-                                Column(
-                                ) {
-                                    if (falesia.altitudine > 0) {
-                                        Text(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            textAlign = TextAlign.End,
-                                            text = "Altitudine " + falesia.altitudine + "m",
-                                            fontSize = 18.sp,
-                                            style = MaterialTheme.typography.headlineMedium.copy(
-                                                fontWeight = FontWeight.Bold)
+                            Column(
+                            ) {
+                                if (falesia.altitudine > 0) {
+                                    Text(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = TextAlign.End,
+                                        text = "Altitudine " + falesia.altitudine + "m",
+                                        fontSize = 18.sp,
+                                        style = MaterialTheme.typography.headlineMedium.copy(
+                                            fontWeight = FontWeight.Bold
                                         )
-                                    }
+                                    )
                                 }
                             }
+                        }
 
                     }
                     Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.inversePrimary)

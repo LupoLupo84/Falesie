@@ -1,6 +1,5 @@
 package com.example.falesie.data.room
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -13,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 
 
 @Dao
-interface ViaDao{
+interface ViaDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(via: Via)
@@ -25,26 +24,27 @@ interface ViaDao{
     suspend fun delete(via: Via)
 
     @Query("SELECT * FROM vie")
-    fun getAllVieNew():List<Via>
+    fun getAllVieNew(): List<Via>
 
-@Query("SELECT * FROM vie WHERE falesiaIdFk =:falesia ORDER BY numero")
-fun getVieFalesia(falesia:String):List<Via>
+    @Query("SELECT * FROM vie WHERE falesiaIdFk =:falesia ORDER BY numero")
+    fun getVieFalesia(falesia: String): List<Via>
 
-//    @Query("SELECT * FROM vie WHERE falesiaIdFk =:falesia AND settore =:settore ORDER BY numero")
-//    fun getVieFalesiaSettore(falesia:String,settore:String):Flow<List<Via>>
 
     @Query("SELECT settore FROM vie WHERE falesiaIdFk =:falesia_id")
-    fun getNomiSettore(falesia_id: String):List<String>
+    fun getNomiSettore(falesia_id: String): List<String>
 
     @Query("SELECT * FROM vie WHERE via_id =:via_id")
-    fun getViaMod(via_id:String):Via
+    fun getViaMod(via_id: String): Via
+
+    @Query("delete from vie")
+    fun deleteDatabaseVie()
 
 
 }
 
 
 @Dao
-interface FalesiaDao{
+interface FalesiaDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(falesia: Falesia)
@@ -56,19 +56,19 @@ interface FalesiaDao{
     suspend fun delete(falesia: Falesia)
 
     @Query("SELECT * FROM falesia")
-    fun getAllFalesie():Flow<List<Falesia>>
+    fun getAllFalesie(): Flow<List<Falesia>>
 
     @Query("SELECT nome FROM falesia WHERE falesia_id =:falesia_id")
-    fun getNomeFalesia(falesia_id:String):String
+    fun getNomeFalesia(falesia_id: String): String
 
     @Query("SELECT nome FROM falesia")
-    fun getNomiFalesie():List<String>
+    fun getNomiFalesie(): List<String>
 
     @Query("SELECT * FROM falesia")
-    fun getAllFalesieNew():List<Falesia>
+    fun getAllFalesieNew(): List<Falesia>
 
-
-
+    @Query("delete from falesia")
+    fun deleteDatabaseFalesia()
 
 
 }
