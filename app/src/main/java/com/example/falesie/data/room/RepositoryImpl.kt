@@ -38,6 +38,10 @@ class ViaRepositoryImpl(private val dao: ViaDao) : ViaRepository {
         return dao.deleteDatabaseVie()
     }
 
+    override suspend fun getIdViaFalesiaSettoreNumero(falesiaId: String, settore: String, numero: Int): Via {
+        return dao.getIdViaFalesiaSettoreNumero(falesiaId,settore,numero)
+    }
+
 }
 
 

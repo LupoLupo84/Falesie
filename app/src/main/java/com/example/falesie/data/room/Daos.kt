@@ -39,6 +39,8 @@ interface ViaDao {
     @Query("delete from vie")
     fun deleteDatabaseVie()
 
+    @Query("SELECT * FROM vie WHERE falesiaIdFk=:falesiaId AND settore=:settore AND numero=:numero")
+    fun getIdViaFalesiaSettoreNumero(falesiaId: String, settore: String, numero: Int): Via
 
 }
 

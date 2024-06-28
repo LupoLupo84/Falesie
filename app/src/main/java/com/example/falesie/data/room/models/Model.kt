@@ -13,12 +13,12 @@ data class Via(
     val id: String,
     var viaName:String,
     var settore:String,
-    val numero: Int,
+    var numero: Int,
     var falesiaIdFk:String,
     var grado: String,
     var protezioni:Int,
     var altezza: Int,
-    val immagine: String,
+    var immagine: String,
     val isChecked:Boolean
 )
 

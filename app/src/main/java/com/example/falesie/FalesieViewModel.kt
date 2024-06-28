@@ -1,6 +1,11 @@
 package com.example.falesie
 
+import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,6 +25,7 @@ class FalesieViewModel(
     private val repositoryVie: ViaRepository
 ) : ViewModel() {
 
+
     val nomeFalesia = MutableLiveData<String>()
     val listaNomiFalesie = MutableLiveData<List<String>>()
     val listaNomiSettore = MutableLiveData<List<String>>()
@@ -29,6 +35,13 @@ class FalesieViewModel(
     var falesieList = MutableLiveData<List<Falesia>>()
     val vieNellaFalesia = MutableLiveData<List<Via>>()
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
+
+
+    private val _viaDaMod2 = MutableLiveData<Via>()
+    val viaDaMod2: LiveData<Via>
+        get() = _viaDaMod2
+    val prossimavia = MutableLiveData<Via>()
+    val precedentevia = MutableLiveData<Via>()
 
     init {
         getVieNellaFalesia()
@@ -57,6 +70,7 @@ class FalesieViewModel(
     fun getViaIdMod(via_id: String) {
         coroutineScope.launch(Dispatchers.Main) {
             viaDaMod.value = asyncGetViaIdMod(via_id).await()
+            _viaDaMod2.value = asyncGetViaIdMod(via_id).await()
         }
     }
 
@@ -142,6 +156,36 @@ class FalesieViewModel(
         coroutineScope.async(Dispatchers.IO) {
             return@async repositoryFalesie.getAllFalesieNew()
         }
+
+
+    fun getIdFromFalesiaSettoreNumeroSucc(falesiaId: String, settore: String, numero: Int){
+        Log.d("nella funzione numero via ", numero.toString())
+        coroutineScope.launch(Dispatchers.Main) {
+            prossimavia.value = asyncGetIdFromFalesiaSettoreNumero(falesiaId = falesiaId, settore = settore, numero = numero).await()
+            //viaDaMod.value = asyncGetIdFromFalesiaSettoreNumero(falesiaId = falesiaId, settore = settore, numero = numero).await()
+            //repositoryVie.getIdViaFalesiaSettoreNumero(falesiaId = falesiaId, settore = settore, numero = numero)
+//            Log.d("falesia", prossimavia.value!!.falesiaIdFk)
+//            Log.d("settore", prossimavia.value!!.settore)
+//            Log.d("nome", prossimavia.value!!.viaName)
+//            Log.d("numero", prossimavia.value!!.numero.toString())
+//            Log.d("id", prossimavia.value!!.id)
+        }
+    }
+
+    fun getIdFromFalesiaSettoreNumeroPrec(falesiaId: String, settore: String, numero: Int){
+        Log.d("nella funzione numero via ", numero.toString())
+        coroutineScope.launch(Dispatchers.Main) {
+            precedentevia.value = asyncGetIdFromFalesiaSettoreNumero(falesiaId = falesiaId, settore = settore, numero = numero).await()
+        }
+    }
+
+    suspend fun asyncGetIdFromFalesiaSettoreNumero(falesiaId:String, settore:String, numero:Int): Deferred<Via> =
+        coroutineScope.async(Dispatchers.IO) {
+            return@async repositoryVie.getIdViaFalesiaSettoreNumero(falesiaId = falesiaId, settore = settore, numero = numero)
+        }
+
+
+
 
 
 }

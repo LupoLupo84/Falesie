@@ -4,20 +4,26 @@ package com.example.falesie
 //https://www.youtube.com/watch?v=voMTReNRvUA&list=PLUPcj46QWTDWlxtIwE3A6VEWUFEO8nh0Z&index=7
 
 
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -37,11 +43,11 @@ import com.example.falesie.screen.ModificaVieScreen
 import com.example.falesie.screen.ProfiloScreen
 import com.example.falesie.screen.RegisterScreen
 import com.example.falesie.screen.VieScreen
-import com.example.falesie.ui.JetShopingNavigation
 import com.example.falesie.ui.theme.FalesieTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 import javax.inject.Inject
 
 
@@ -53,6 +59,8 @@ class MainActivity() : ComponentActivity() {
     companion object {
         val auth by lazy { Firebase.auth }
         lateinit var userCorrente: User
+        var immagineViaPassata = ""
+
 
 
         var listaVie: ArrayList<Via> = ArrayList()                          // Firestore  Tutte le vie presenti nel db
@@ -198,6 +206,7 @@ class MainActivity() : ComponentActivity() {
                                 )
                             }
                         }
+
                     }
 
 
@@ -233,7 +242,19 @@ class MainActivity() : ComponentActivity() {
 
 
 
+    @Composable
+    fun ImagePicker(onImageSelected: (Uri) -> Unit) {
+        val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+            onResult = { uri: Uri? -> uri?.let { onImageSelected(it) } }
+        )
 
+        Button(
+            onClick = { launcher.launch("image/*") }
+        ) {
+            Text("Select Image")
+        }
+    }
 
 
 
@@ -251,10 +272,5 @@ class MainActivity() : ComponentActivity() {
 
 //finishAndRemoveTask()
 
-
-@Composable
-fun JetShoppingApp() {
-    JetShopingNavigation()
-}
 
 

@@ -1,11 +1,13 @@
 package com.example.falesie.data.firestore
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.falesie.Aggiorna
 import com.example.falesie.FalesieViewModel
@@ -18,7 +20,7 @@ import com.example.falesie.data.room.models.Via
 fun salvaDbVieInLocale(factory: FalesieViewModelFactory) {
     //USATA PER SALVARE IL DATABASE DI RETE NEL DATABASE LOCALE
     var caricamentoCompletato by remember { mutableStateOf(false) }
-    FirestoreClass().leggiTutteLeVie(object : Aggiorna {
+    FirestoreClass().readAllVie(object : Aggiorna {
         override fun aggiorna() {
             Log.i("VIE LETTE ELSE", MainActivity.listaVie.size.toString())
             caricamentoCompletato = true
@@ -34,9 +36,10 @@ fun salvaDbVieInLocale(factory: FalesieViewModelFactory) {
 
 @Composable
 fun salvaDbFalesieInLocale(factory: FalesieViewModelFactory) {
+    var context = LocalContext.current
     //USATA PER SALVARE IL DATABASE DI RETE NEL DATABASE LOCALE
     var caricamentoCompletato by remember { mutableStateOf(false) }
-    FirestoreClass().leggiTutteLeFalesie(object : Aggiorna {
+    FirestoreClass().readAllFalesie(object : Aggiorna {
         override fun aggiorna() {
             Log.i("FALESIE LETTE ELSE", MainActivity.listaFalesie.size.toString())
             caricamentoCompletato = true
@@ -46,6 +49,9 @@ fun salvaDbFalesieInLocale(factory: FalesieViewModelFactory) {
 
         //SALVA LE VIE NEL DATABASE LOCALE ROOM
         salvaFalesieInLocale(factory)
+
+        var messaggio = MainActivity.listaVie.size.toString() + " Vie scaricate in locale.."
+        Toast.makeText(context, messaggio, Toast.LENGTH_SHORT).show()
     }
 }
 

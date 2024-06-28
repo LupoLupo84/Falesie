@@ -20,6 +20,8 @@ interface ViaRepository {
 
     suspend fun deleteDatabaseVie()
 
+    suspend fun getIdViaFalesiaSettoreNumero(falesiaId: String, settore: String, numero: Int): Via
+
 
 }
 
