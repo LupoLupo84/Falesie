@@ -2,16 +2,20 @@ package com.example.falesie.screen
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SettingsApplications
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -109,10 +114,16 @@ fun GestioneFalesieFrame(
 
                 // RITORNO DELLA CHIAMATA SULLA FUNZIONE ONCLICK DELLA FALESIA
                 VisualizzaFalesie(falesia = item, {
-                    Constants.FALESIACORRENTEID = it.id
                     val route = "${"ModificaVieScreen"}/${it.nome}"
+                    Constants.FALESIACORRENTEID = it.id
                     navController.navigate(route)
-                })
+                },
+                {
+                    val route2 = "${"ModificaFalesiaScreen"}/${it.nome}"
+                    Constants.FALESIACORRENTEID = it.id
+                    navController.navigate(route2)
+                }
+                )
             }
         }
     }
@@ -122,7 +133,8 @@ fun GestioneFalesieFrame(
 @Composable
 fun VisualizzaFalesie(
     falesia: Falesia,
-    onSelectFalesia: (Falesia) -> Unit
+    onSelectFalesia: (Falesia) -> Unit,
+    onSelectFalesia2: (Falesia) -> Unit
 ) {
 
 
@@ -133,20 +145,36 @@ fun VisualizzaFalesie(
         shape = RoundedCornerShape(10.dp),
         shadowElevation = 2.dp
     ) {
-        Row {
+        Row (
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Column(
+            ) {
+                IconButton(onClick = {
+                    onSelectFalesia2(falesia)
+                    Log.d("FALESIA SELEZIONATA", falesia.id)
+                }) {
+                    Icon(imageVector = Icons.Filled.SettingsApplications, contentDescription = "")
+                }
+
+            }
+
             Column(
                 modifier = Modifier
-                    .padding(8.dp)
+                    //.padding(8.dp)
                     .fillMaxWidth()
-                    .weight(1f)
+                    .wrapContentHeight()
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                    Text(
+//                        modifier = Modifier
+//                            .padding(start = 8.dp, top = 3.dp, bottom = 3.dp),
+                        fontSize = 24.sp,
+                        text = falesia.nome
+                    )
 
-                Text(
-                    modifier = Modifier
-                        .padding(start = 8.dp, top = 3.dp, bottom = 3.dp),
-                    fontSize = 24.sp,
-                    text = falesia.nome
-                )
             }
             Column(
             ) {

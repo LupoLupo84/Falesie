@@ -35,6 +35,7 @@ class FalesieViewModel(
     var falesieList = MutableLiveData<List<Falesia>>()
     val vieNellaFalesia = MutableLiveData<List<Via>>()
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    var falesia = MutableLiveData<Falesia>()
 
 
     private val _viaDaMod2 = MutableLiveData<Via>()
@@ -156,6 +157,30 @@ class FalesieViewModel(
         coroutineScope.async(Dispatchers.IO) {
             return@async repositoryFalesie.getAllFalesieNew()
         }
+
+
+
+
+
+
+
+
+    fun getFalesiaFromName(nome: String) {
+        coroutineScope.launch(Dispatchers.Main) {
+            falesia.value = asyncgetFalesiaFromName(nome).await()
+        }
+    }
+
+    private fun asyncgetFalesiaFromName(nome: String): Deferred<Falesia> =
+        coroutineScope.async(Dispatchers.IO) {
+            return@async repositoryFalesie.getFalesiaFromName(nome)
+        }
+
+
+
+
+
+
 
 
     fun getIdFromFalesiaSettoreNumeroSucc(falesiaId: String, settore: String, numero: Int){

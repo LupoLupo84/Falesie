@@ -77,5 +77,9 @@ class FalesiaRepositoryImpl(private val dao: FalesiaDao) : FalesiaRepository {
         return dao.deleteDatabaseFalesia()
     }
 
+    override suspend fun getFalesiaFromName(nome: String): Falesia {
+        return dao.getFalesiaFromName(nome)
+    }
+
 
 }

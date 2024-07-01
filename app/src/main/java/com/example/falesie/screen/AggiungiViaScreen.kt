@@ -86,25 +86,37 @@ import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun AggiornaViaScreen(
+fun AggiungiViaScreen(
     navController: NavHostController,
-    idVia: String,
+    //idVia: String,
     factory: FalesieViewModelFactory,
     falesieViewModel: FalesieViewModel = viewModel(factory = factory),
     //vieNellaFalesia: State<List<Via>>,
-    vieNellaFalesia: List<Via>,
-    viaDaModificare: Via
+    //vieNellaFalesia: List<Via>,
+    //viaDaModificare: Via
 ) {
     //val viaDaModificare by falesieViewModel.viaDaMod.observeAsState()
     //val viaDaModificare = viaDaMod!!
+    var via: com.example.falesie.data.firestore.model.Via = com.example.falesie.data.firestore.model.Via(
+        id = "",
+        nome = "",
+        settore = "",
+        numero = 0,
+        falesia = "",
+        grado = "",
+        protezioni = 0,
+        altezza = 0,
+        immagine = "",
+    )
 
 
     falesieViewModel.getNomiFalesie()
-    falesieViewModel.getNomiSettore(viaDaModificare.falesiaIdFk)
-    falesieViewModel.getNomeFalesia(viaDaModificare.falesiaIdFk)                             //chiama la funzione per leggere il nome della falesia tramite id
+//    falesieViewModel.getNomiSettore(viaDaModificare.falesiaIdFk)
+//    falesieViewModel.getNomeFalesia(viaDaModificare.falesiaIdFk)                             //chiama la funzione per leggere il nome della falesia tramite id
     val nomeFalesiaViewModel by falesieViewModel.nomeFalesia.observeAsState()       //osserva quando il risultato della funzione viene aggiornato
     val listaNomiFalesie by falesieViewModel.listaNomiFalesie.observeAsState()
     val listaNomiSettoreViewModel by falesieViewModel.listaNomiSettore.observeAsState()
+    val falesia by falesieViewModel.falesia.observeAsState()
 
 
     //val test by falesieViewModel.viaDaMod2.observeAsState()
@@ -133,42 +145,42 @@ fun AggiornaViaScreen(
     val listaNomiSettore = listaNomiSettoreViewModel?.distinct()
 
 
-    Log.d("LISTA NOMI FALESIA", listaNomiFalesie?.size.toString())
-
-    viaDaModificare?.let { Log.d("SETTORE VIA", it.settore) }
+//    Log.d("LISTA NOMI FALESIA", listaNomiFalesie?.size.toString())
+//
+//    viaDaModificare?.let { Log.d("SETTORE VIA", it.settore) }
 
 
     //var nomeFalesia = ""
 
 
-    val nomeFalesia = nomeFalesiaViewModel
-
-    //LEGGI LA VIA SUCCESSIVA
-    falesieViewModel.getIdFromFalesiaSettoreNumeroSucc(
-        falesiaId = viaDaModificare.falesiaIdFk,
-        settore = viaDaModificare.settore,
-        numero = viaDaModificare.numero + 1
-    )
-
-    //LEGGI LA VIA PRECEDENTE
-    falesieViewModel.getIdFromFalesiaSettoreNumeroPrec(
-        falesiaId = viaDaModificare.falesiaIdFk,
-        settore = viaDaModificare.settore,
-        numero = viaDaModificare.numero - 1
-    )
-
-
+//    val nomeFalesia = nomeFalesiaViewModel
+//
+//    //LEGGI LA VIA SUCCESSIVA
+//    falesieViewModel.getIdFromFalesiaSettoreNumeroSucc(
+//        falesiaId = viaDaModificare.falesiaIdFk,
+//        settore = viaDaModificare.settore,
+//        numero = viaDaModificare.numero + 1
+//    )
+//
+//    //LEGGI LA VIA PRECEDENTE
+//    falesieViewModel.getIdFromFalesiaSettoreNumeroPrec(
+//        falesiaId = viaDaModificare.falesiaIdFk,
+//        settore = viaDaModificare.settore,
+//        numero = viaDaModificare.numero - 1
+//    )
 
 
 
 
 
 
-        if (viaDaModificare.falesiaIdFk == "") {
-            viaDaModificare.falesiaIdFk = viaDaModificare.falesiaIdFk
-            //falesieViewModel.getFalesia(viaDaModificare.falesiaIdFk)
-            Log.d("FALESIA ID CORRENTE", viaDaModificare.falesiaIdFk)
-        }
+
+
+//        if (viaDaModificare.falesiaIdFk == "") {
+//            viaDaModificare.falesiaIdFk = viaDaModificare.falesiaIdFk
+//            //falesieViewModel.getFalesia(viaDaModificare.falesiaIdFk)
+//            Log.d("FALESIA ID CORRENTE", viaDaModificare.falesiaIdFk)
+//        }
 
 
         val scrollBehaivor = TopAppBarDefaults.pinnedScrollBehavior()
@@ -195,14 +207,14 @@ fun AggiornaViaScreen(
                         scrollBehaivor = scrollBehaivor,
                         scope = scope,
                         drawerState = drawerState,
-                        titolo = viaDaModificare.id,
+                        titolo = "Aggiungi via",
                     )
                 }
             ) {
                 val secondPadding = it.calculateTopPadding()
                 val columnHeightDp by remember { mutableStateOf(0.dp) }
                 val localDensity = LocalDensity.current
-                val listSorted = vieNellaFalesia.toList()
+                //val listSorted = vieNellaFalesia.toList()
 
 
                 Surface(
@@ -233,13 +245,17 @@ fun AggiornaViaScreen(
                             ) {
 
 
-                                    if (nomeFalesia != null) {
-                                        EditaDropdown(
-                                            testo = "falesia",
-                                            selezioneAttuale = nomeFalesia,
-                                            selezioneMenu = emptyList()
-                                        )
-                                    }
+
+                                        listaNomiFalesie?.let { it1 ->
+                                            falesieViewModel.getFalesiaFromName(
+                                            EditaDropdown(
+                                                testo = "falesia",
+                                                selezioneAttuale = "          ",
+                                                //selezioneMenu = emptyList()
+                                                selezioneMenu = it1
+                                            )
+                                            )
+                                        }
 
 
 
@@ -249,28 +265,36 @@ fun AggiornaViaScreen(
 
 
 
-                                viaDaModificare.settore =
-                                    listaNomiSettore?.let { listaNomiSettore ->
-                                        EditaDropdown(
-                                            testo = "settore",
-                                            selezioneAttuale = viaDaModificare.settore,
-                                            selezioneMenu = listaNomiSettore
-                                        )
-                                    }.toString()
+
+//                                via.settore =
+//                                    listaNomiSettore?.let { it1 ->
+//                                        EditaDropdown(
+//                                            testo = "settore",
+//                                            selezioneAttuale = via.settore,
+//                                            selezioneMenu = it1
+//                                        )
+//                                    }.toString()
+
+                                via.settore =
+                                    EditaTesto(
+                                        "settore",
+                                        via.settore
+                                    )
 
 
-                                viaDaModificare.numero =
+
+                                via.numero =
                                     EditaDropdown(
                                         "numero",
-                                        viaDaModificare.numero.toString(),
+                                        via.numero.toString(),
                                         numeri50
                                     ).toInt()
 
 
-                                viaDaModificare.viaName =
+                                via.nome =
                                     EditaTesto(
                                         "nome",
-                                        viaDaModificare.viaName
+                                        via.nome
                                     )
 
 
@@ -280,10 +304,10 @@ fun AggiornaViaScreen(
                                     Column(
                                         modifier = Modifier.weight(1F)
                                     ) {
-                                        viaDaModificare.grado =
+                                        via.grado =
                                             EditaDropdown(
                                                 "grado",
-                                                viaDaModificare.grado,
+                                                via.grado,
                                                 listaGradi
                                             )
                                     }
@@ -292,22 +316,22 @@ fun AggiornaViaScreen(
                                     ) {
 
 
-                                        viaDaModificare.altezza =
+                                        via.altezza =
                                             EditaDropdown(
                                                 "altezza",
-                                                viaDaModificare.altezza.toString(),
+                                                via.altezza.toString(),
                                                 numeri50
                                             ).toInt()
                                     }
                                     Column(
                                         modifier = Modifier.weight(1F)
                                     ) {
-                                        Log.d("protezioni", viaDaModificare.protezioni.toString())
+                                        Log.d("protezioni", via.protezioni.toString())
 
-                                        viaDaModificare.protezioni =
+                                        via.protezioni =
                                             EditaDropdown(
                                                 "protezioni",
-                                                viaDaModificare.protezioni.toString(),
+                                                via.protezioni.toString(),
                                                 numeri50
                                             ).toInt()
                                     }
@@ -316,8 +340,8 @@ fun AggiornaViaScreen(
                                 Row {
                                     Column {
 
-                                        if (viaDaModificare.immagine == ""){
-                                            viaDaModificare.immagine =
+                                        if (via.immagine == ""){
+                                            via.immagine =
                                                 EditaTesto(
                                                     "nome immagine",
                                                     //viaDaModificare.immagine
@@ -325,10 +349,10 @@ fun AggiornaViaScreen(
                                                 )
                                         }else {
 
-                                            viaDaModificare.immagine =
+                                            via.immagine =
                                                 EditaTesto(
                                                     "nome immagine",
-                                                    viaDaModificare.immagine
+                                                    via.immagine
                                                     //immagineViaPassata
                                                 )
                                         }
@@ -340,29 +364,29 @@ fun AggiornaViaScreen(
                                     horizontalArrangement = Arrangement.Center,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .wrapContentWidth()
-                                            .weight(0.1f)                                    ) {
-                                        IconButton(onClick = {
-                                            //salvaViaNelDatabase(viaDaModificare)
-                                            //LEGGI LA VIA PRECEDENTE
-                                            if (precedentevia?.id?.isNotEmpty() == true){
-                                                navController.popBackStack()
-                                                val route = "${"AggiornaViaScreen"}/${precedentevia!!.id}"
-                                                //val route = "${"AggiornaViaScreen"}/${falesieViewModel.prossimavia.value?.id}"
-                                                navController.navigate(route)
-                                            }
-
-
-                                        }) {
-                                            Icon(
-                                                modifier = Modifier.size(larghezzaFrecce),            //50.dp
-                                                imageVector = Icons.Filled.ArrowCircleLeft,
-                                                contentDescription = "ArrowBack"
-                                            )
-                                        }
-                                    }           //FRECCIA INDIETRO
+//                                    Column(
+//                                        modifier = Modifier
+//                                            .wrapContentWidth()
+//                                            .weight(0.1f)                                    ) {
+//                                        IconButton(onClick = {
+//                                            //salvaViaNelDatabase(viaDaModificare)
+//                                            //LEGGI LA VIA PRECEDENTE
+//                                            if (precedentevia?.id?.isNotEmpty() == true){
+//                                                navController.popBackStack()
+//                                                val route = "${"AggiornaViaScreen"}/${precedentevia!!.id}"
+//                                                //val route = "${"AggiornaViaScreen"}/${falesieViewModel.prossimavia.value?.id}"
+//                                                navController.navigate(route)
+//                                            }
+//
+//
+//                                        }) {
+//                                            Icon(
+//                                                modifier = Modifier.size(larghezzaFrecce),            //50.dp
+//                                                imageVector = Icons.Filled.ArrowCircleLeft,
+//                                                contentDescription = "ArrowBack"
+//                                            )
+//                                        }
+//                                    }           //FRECCIA INDIETRO
 
                                     Column(
                                         modifier = Modifier
@@ -372,7 +396,7 @@ fun AggiornaViaScreen(
                                         val myDir: File =
                                             File(LocalContext.current.filesDir, "falesie")
                                         val new_file: File =
-                                            File("$myDir" + File.separator + viaDaModificare.immagine + ".webp")
+                                            File("$myDir" + File.separator + via.immagine + ".webp")
                                         val immagine = new_file.absolutePath.toString()
                                         //     "https://www.gyfted.me/_next/image?url=%2Fimg%2Fcharacters%2Fmilhouse-van-houten.png&w=640&q=75"
                                         Log.d("IMMAGINE", new_file.absolutePath)
@@ -394,32 +418,32 @@ fun AggiornaViaScreen(
                                         )
                                     }           //IMMAGINE
 
-                                    Column(
-                                        modifier = Modifier
-                                            .wrapContentWidth()
-                                            .weight(0.1f)
-                                    ) {
-                                        IconButton(onClick = {
-                                            if (prossimavia?.id?.isNotEmpty() == true){
-                                                navController.popBackStack()
-                                                val route = "${"AggiornaViaScreen"}/${prossimavia!!.id}"
-                                                //val route = "${"AggiornaViaScreen"}/${falesieViewModel.prossimavia.value?.id}"
-                                                navController.navigate(route)
-                                            }
-
-
-
-
-
-
-                                        }) {
-                                            Icon(
-                                                modifier = Modifier.size(larghezzaFrecce),            //50.dp
-                                                imageVector = Icons.Filled.ArrowCircleRight,
-                                                contentDescription = "ArrowNext"
-                                            )
-                                        }
-                                    }           //FRECCIA AVANTI
+//                                    Column(
+//                                        modifier = Modifier
+//                                            .wrapContentWidth()
+//                                            .weight(0.1f)
+//                                    ) {
+//                                        IconButton(onClick = {
+//                                            if (prossimavia?.id?.isNotEmpty() == true){
+//                                                navController.popBackStack()
+//                                                val route = "${"AggiornaViaScreen"}/${prossimavia!!.id}"
+//                                                //val route = "${"AggiornaViaScreen"}/${falesieViewModel.prossimavia.value?.id}"
+//                                                navController.navigate(route)
+//                                            }
+//
+//
+//
+//
+//
+//
+//                                        }) {
+//                                            Icon(
+//                                                modifier = Modifier.size(larghezzaFrecce),            //50.dp
+//                                                imageVector = Icons.Filled.ArrowCircleRight,
+//                                                contentDescription = "ArrowNext"
+//                                            )
+//                                        }
+//                                    }           //FRECCIA AVANTI
 
                                 }
 
@@ -430,37 +454,54 @@ fun AggiornaViaScreen(
                                     ) {
                                         TextButton(
                                             onClick = {
-                                                Log.d("Falesia id", viaDaModificare.falesiaIdFk)
-                                                Log.d("Settore", viaDaModificare.settore)
-                                                Log.d("Nome", viaDaModificare.viaName)
-                                                Log.d("Grado", viaDaModificare.grado)
-                                                Log.d("Altezza", viaDaModificare.altezza.toString())
-                                                Log.d(
-                                                    "Protezioni",
-                                                    viaDaModificare.protezioni.toString()
-                                                )
-                                                Log.d("Immagine", viaDaModificare.immagine)
+
                                                 //TODO AGGIORNARE FALESIA SU FIRESTORE
 
-                                                immagineViaPassata = viaDaModificare.immagine
+                                                //falesieViewModel.getFalesiaFromName(via.falesia)
 
-                                                val viaFirestore: com.example.falesie.data.firestore.model.Via =
-                                                    com.example.falesie.data.firestore.model.Via(
-                                                        id = viaDaModificare.id,
-                                                        nome = viaDaModificare.viaName,
-                                                        settore = viaDaModificare.settore,
-                                                        numero = viaDaModificare.numero,
-                                                        falesia = viaDaModificare.falesiaIdFk,
-                                                        grado = viaDaModificare.grado,
-                                                        protezioni = viaDaModificare.protezioni,
-                                                        altezza = viaDaModificare.altezza,
-                                                        immagine = viaDaModificare.immagine,
+
+                                                falesia?.let { it ->
+                                                    via.falesia = it.id
+
+                                                    Log.d("Falesia id", via.falesia)
+                                                    Log.d("Settore", via.settore)
+                                                    Log.d("Nome", via.nome)
+                                                    Log.d("Grado", via.grado)
+                                                    Log.d("Altezza", via.altezza.toString())
+                                                    Log.d(
+                                                        "Protezioni",
+                                                        via.protezioni.toString()
                                                     )
-                                                FirestoreClass().updateVia(viaFirestore,context)
+                                                    Log.d("Immagine", via.immagine)
+
+
+
+
+
+
+
+                                                    FirestoreClass().creaVia(via, context)
+                                                    Log.d("Via inserita", "CORRETTAMENTE")
+
+                                                    //Imposta il ricarico delle falesie al prossimo riavvio
+                                                    val setAggiorna: HashMap<String, Any> = hashMapOf("aggiorna" to true)
+                                                    FirestoreClass().updateUserProfileData(
+                                                        setAggiorna
+                                                    )
+
+                                                    navController.popBackStack()
+
+                                                }
+
+
+                                                //immagineViaPassata = via.immagine
+
+
+
                                             }
 
                                         ) {
-                                            Text(text = "Aggiorna")
+                                            Text(text = "Aggiungi via")
                                         }
 
                                         //prossimavia?.let { it1 -> Text(text = it1.viaName) }

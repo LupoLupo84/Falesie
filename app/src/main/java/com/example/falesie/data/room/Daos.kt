@@ -72,5 +72,8 @@ interface FalesiaDao {
     @Query("delete from falesia")
     fun deleteDatabaseFalesia()
 
+    @Query("SELECT * FROM falesia WHERE nome=:nome")
+    fun getFalesiaFromName(nome: String): Falesia
+
 
 }

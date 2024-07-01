@@ -236,6 +236,7 @@ fun ListItem(
                         text = falesia.nome,
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold,
+                            color = Color.White,
                             shadow = Shadow(
                                 color = Color.Black,
                                 offset = Offset(2f,2f),
@@ -251,7 +252,8 @@ fun ListItem(
                 OutlinedButton(onClick = { expanded.value = !expanded.value }) {
                     Text(
                         if (expanded.value) "Comprimi ▲" else "Espandi ▼",
-                        color = MaterialTheme.colorScheme.inversePrimary,
+                        //color = MaterialTheme.colorScheme.inversePrimary,
+                        color = Color.White,
                         style = TextStyle(
                             shadow = Shadow(
                                 color = Color.Black,

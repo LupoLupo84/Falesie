@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AcUnit
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BlurLinear
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Logout
@@ -73,6 +74,20 @@ fun ModalDrawerSheetMenu(
             title = "GestioneFalesie",
             "GestioneFalesie",
             Icons.Filled.Settings,
+            true
+        ),
+        MenuItem(
+            id = "AggiungiFalesia",
+            title = "AggiungiFalesia",
+            "AggiungiFalesia",
+            Icons.Filled.Add,
+            true
+        ),
+        MenuItem(
+            id = "AggiungiVia",
+            title = "AggiungiVia",
+            "AggiungiVia",
+            Icons.Filled.Add,
             true
         ),
         MenuItem(id = "Logout", title = "Logout", "Logout", Icons.Filled.Logout, false),
@@ -139,6 +154,20 @@ fun ModalDrawerSheetMenu(
                         selectedItems = ""
                         navController.popBackStack()
                         navController.navigate("GestioneFalesieScreen")
+                    }
+
+                    "AggiungiFalesia" -> {
+                        Log.d("SELEZIONE", selectedItems)
+                        selectedItems = ""
+                        navController.popBackStack()
+                        navController.navigate("AggiungiFalesiaScreen")
+                    }
+
+                    "AggiungiVia" -> {
+                        Log.d("SELEZIONE", selectedItems)
+                        selectedItems = ""
+                        navController.popBackStack()
+                        navController.navigate("AggiungiViaScreen")
                     }
 
                     "Logout" -> {

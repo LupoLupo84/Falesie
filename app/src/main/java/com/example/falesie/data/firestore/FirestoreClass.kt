@@ -74,7 +74,25 @@ class FirestoreClass{
     }
 
 
-    fun creaVia(via: Via) {
+
+    fun updateFalesia(falesia: Falesia, context: Context) {
+        //val idAutogenerato = mFireStore.collection("vie").document().id
+        //via.id = idAutogenerato
+        mFireStore.collection("falesie")
+            .document(falesia.id)
+            .set(falesia, SetOptions.merge())
+            .addOnCompleteListener{
+                Log.e("firebase", "Falesia AGGIORNATA correttamente.")
+                Toast.makeText(context, "Falesia AGGIORNATA correttamente.", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
+
+
+
+
+    fun creaVia(via: Via,context: Context) {
         val idAutogenerato = mFireStore.collection("vie").document().id
         via.id = idAutogenerato
         mFireStore.collection("vie")
@@ -82,6 +100,19 @@ class FirestoreClass{
             .set(via, SetOptions.merge())
             .addOnCompleteListener{
                 Log.e("firebase", "Via creata correttamente.")
+                Toast.makeText(context, "Via creata correttamente.", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    fun creaFalesia(falesia: Falesia,context: Context) {
+        val idAutogenerato = mFireStore.collection("falesie").document().id
+        falesia.id = idAutogenerato
+        mFireStore.collection("falesie")
+            .document(falesia.id)
+            .set(falesia, SetOptions.merge())
+            .addOnCompleteListener{
+                Log.e("firebase", "Falesia creata correttamente.")
+                Toast.makeText(context, "Falesia creata correttamente.", Toast.LENGTH_SHORT).show()
             }
     }
 

@@ -268,6 +268,7 @@ fun VieScreen(
                                                     Text(
                                                         text = vieNellaFalesia[it].settore,
                                                         fontSize = 12.sp,
+                                                        color = Color.White,
                                                         style = TextStyle(
                                                             shadow = Shadow(
                                                                 color = Color.Black,
@@ -287,6 +288,7 @@ fun VieScreen(
                                                         ),
                                                         text = "${vieNellaFalesia[it].numero} - ${vieNellaFalesia[it].viaName}",
                                                         style = MaterialTheme.typography.titleMedium.copy(
+                                                            color = Color.White,
                                                             fontWeight = FontWeight.Bold,
                                                             shadow = Shadow(
                                                                 color = Color.Black,

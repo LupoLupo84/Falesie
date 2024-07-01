@@ -7,12 +7,12 @@ data class Via(
     var id: String = "",
     var falesia: String = "",
     var settore: String = "",
-    val numero: Int = 0,
+    var numero: Int = 0,
     var nome: String = "",
-    val grado: String = "",
-    val protezioni: Int = 0,
-    val altezza: Int = 0,
-    val immagine: String = ""
+    var grado: String = "",
+    var protezioni: Int = 0,
+    var altezza: Int = 0,
+    var immagine: String = ""
 ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString()!!,

@@ -36,9 +36,12 @@ import com.example.falesie.data.firestore.model.User
 import com.example.falesie.data.firestore.model.Via
 import com.example.falesie.data.firestore.model.ViaScalata
 import com.example.falesie.screen.AggiornaViaScreen
+import com.example.falesie.screen.AggiungiFalesiaScreen
+import com.example.falesie.screen.AggiungiViaScreen
 import com.example.falesie.screen.FalesieScreen
 import com.example.falesie.screen.GestioneFalesieScreen
 import com.example.falesie.screen.LoginScreen
+import com.example.falesie.screen.ModificaFalesiaScreen
 import com.example.falesie.screen.ModificaVieScreen
 import com.example.falesie.screen.ProfiloScreen
 import com.example.falesie.screen.RegisterScreen
@@ -132,6 +135,12 @@ class MainActivity() : ComponentActivity() {
                     composable("GestioneFalesieScreen") {
                         GestioneFalesieScreen(navController, factory)
                     }
+                    composable("AggiungiFalesiaScreen") {
+                        AggiungiFalesiaScreen(navController, factory)
+                    }
+                    composable("AggiungiViaScreen") {
+                        AggiungiViaScreen(navController, factory)
+                    }
                     // esempio navArgument https://www.reddit.com/r/JetpackCompose/comments/15gieu3/how_to_pass_arguments_to_a_composable_using/
                     composable(
                         route = "${"VieScreen"}/{nomeFalesia}",
@@ -169,6 +178,30 @@ class MainActivity() : ComponentActivity() {
                         val vieNellaFalesia by falesieViewModel.vieNellaFalesia.observeAsState()
                         vieNellaFalesia?.let { it->
                             ModificaVieScreen(
+                                navController,
+                                nomeFalesia,
+                                factory,
+                                falesieViewModel,
+                                it
+                            )
+                        }
+                    }
+
+
+                    //MODIFICA FALESIA
+                    composable(
+                        route = "${"ModificaFalesiaScreen"}/{nomeFalesia}",
+                        arguments = listOf(
+                            navArgument("nomeFalesia") { type = NavType.StringType }
+                        )
+                    ) { backStackEntry ->
+                        val arguments = requireNotNull(backStackEntry.arguments)
+                        val nomeFalesia =
+                            arguments.getString("nomeFalesia") ?: error("")
+                        val falesieViewModel: FalesieViewModel = viewModel(factory = factory)
+                        val vieNellaFalesia by falesieViewModel.vieNellaFalesia.observeAsState()
+                        vieNellaFalesia?.let { it->
+                            ModificaFalesiaScreen(
                                 navController,
                                 nomeFalesia,
                                 factory,

@@ -26,15 +26,15 @@ data class Via(
 data class Falesia(
     @ColumnInfo(name = "falesia_id")
     @PrimaryKey(autoGenerate = false)
-    var id: String ,
-    val nome: String ,
-    val descrizione: String ,
-    var latitudine: String ,
-    var longitudine: String ,
-    val stagioni: Int ,
-    val altitudine: Int ,
-    val primavera: Boolean ,
-    val estate: Boolean ,
-    val autunno: Boolean ,
-    val inverno: Boolean ,
+    var id: String,
+    var nome: String,
+    var descrizione: String,
+    var latitudine: String,
+    var longitudine: String,
+    val stagioni: Int,
+    var altitudine: Int,
+    var primavera: Boolean,
+    var estate: Boolean,
+    var autunno: Boolean,
+    var inverno: Boolean,
 )

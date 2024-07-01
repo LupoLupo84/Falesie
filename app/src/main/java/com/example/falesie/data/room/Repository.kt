@@ -42,5 +42,7 @@ interface FalesiaRepository {
 
     suspend fun deleteDatabaseFalesia()
 
+    suspend fun getFalesiaFromName(nome: String): Falesia
+
 
 }
